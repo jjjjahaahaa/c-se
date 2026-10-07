@@ -171,6 +171,28 @@ def cmd_report(args) -> int:
     return 0
 
 
+def cmd_jev_check(args) -> int:
+    """Eine Testanfrage an Jev (nur mit API-Key in der Umgebung)."""
+    from .counting.counter import Counter
+    from .models import HandState, Rules
+    from .strategy.jev import JevEngine
+
+    engine = JevEngine(Rules(), blocking=True)
+    if not engine.available:
+        print(engine.status)
+        print("API-Key als Umgebungsvariable TYPESAFE_API_KEY (oder JEV_API_KEY) setzen "
+              "bzw. in .env eintragen (Vorlage: .env.example).")
+        return 1
+    hand = HandState(["10", "6"], "10")
+    decision = engine.decide(hand, Counter("hi_lo").state())
+    print(f"16 gegen 10, TC 0 → {decision.action.german} (Quelle: {decision.source})")
+    for action, p in sorted(decision.probabilities.items(), key=lambda kv: -kv[1]):
+        print(f"  {action:10s} {p:6.1%}")
+    if engine.status:
+        print(engine.status)
+    return 0 if decision.source == "jev" else 1
+
+
 def cmd_run(args) -> int:
     from .app import run_app
 
@@ -215,6 +237,9 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("report", help="index.html für ein Erkennungs-Log erzeugen")
     p.add_argument("folder")
     p.set_defaults(func=cmd_report)
+
+    sub.add_parser("jev-check", help="Verbindung zu Jev testen (braucht API-Key)").set_defaults(
+        func=cmd_jev_check)
 
     p = sub.add_parser("run", help="Assistent mit Overlay starten")
     p.add_argument("--profile", help="Profil (Standard: erstes Profil)")

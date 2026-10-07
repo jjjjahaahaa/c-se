@@ -318,9 +318,29 @@ Bereichsauswahl, Kalibrierfenster, Bildschirmaufnahme und Hotkeys auf einem virt
 Bildschirm. `tools/screen_demo.py` spielt das Mock-Casino in einem sichtbaren Browser und
 prüft den im Overlay angezeigten Count gegen die Ground Truth.
 
+## Jev (Phase 5, optional)
+
+[Jev](https://docs.typesafe.ai) von TypeSafe AI ist ein Entscheidungsmodell: Es bekommt einen
+Zustand und eine Auswahlfrage und liefert die gewählte Option mit Wahrscheinlichkeiten.
+
+```bash
+cp .env.example .env            # dann TYPESAFE_API_KEY=... eintragen (nie committen!)
+python -m blackjack_assistant jev-check                  # eine Testanfrage
+python -m blackjack_assistant run --profile mock_casino --engine jev
+```
+
+- Request: `POST https://api.typesafe.ai/v1/systemone` mit Zustand (Spielerkarten, Summe,
+  soft, Dealer-Karte, True Count, Restdecks, erlaubte Aktionen) und einer Choice-Frage.
+  Angeboten werden **nur die gerade erlaubten Aktionen**, Jev kann also nichts Unmögliches wählen.
+- Antwort: gewählte Aktion + Wahrscheinlichkeit jeder Aktion (im Overlay angezeigt) + Konfidenz.
+- Im Overlay läuft die Anfrage im Hintergrund; bis die Antwort da ist, steht die Empfehlung
+  der lokalen Strategie da („Jev rechnet …“). Gleiche Situationen werden nur einmal angefragt.
+- Versicherung entscheidet weiterhin die lokale Strategie.
+
 ## Konfiguration und Geheimnisse
 
-- Der Jev-API-Key wird **nur** aus der Umgebungsvariable `JEV_API_KEY` gelesen
-  (optional über eine lokale `.env`-Datei).
+- Der Jev-API-Key wird **nur** aus der Umgebungsvariable `TYPESAFE_API_KEY` (oder
+  `JEV_API_KEY`) gelesen, optional über eine lokale `.env`-Datei.
 - `.env` steht in `.gitignore` und wird nie committet. `.env.example` dient als Vorlage.
-- Ohne Key läuft alles offline mit der lokalen Strategie.
+- Ohne Key, mit ungültigem Key oder ohne Internet wird automatisch die lokale Strategie
+  verwendet – alles läuft offline.

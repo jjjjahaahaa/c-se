@@ -84,3 +84,19 @@ Voraussetzung: Bereiche für `mock_casino` festgelegt (B1, B2), Mock-Casino im B
 Automatischer Gesamtablauf (öffnet einen sichtbaren Browser, spielt 5 Runden, zeigt das Overlay):
 `python tools/screen_demo.py --rounds 5 --shot logs/overlay_demo.png` → Ausgabe vergleicht den
 angezeigten Running Count mit der Ground Truth (müssen gleich sein).
+
+---
+
+## D. Jev (Phase 5, optional, braucht Internet und einen API-Key)
+
+In der Entwicklungsumgebung gab es keinen API-Key; getestet wurde mit einer nachgebildeten API.
+
+| # | Befehl / Aktion | Erwartetes Ergebnis | OK? |
+|---|---|---|---|
+| D1 | Ohne Key: `python -m blackjack_assistant jev-check` | „Jev: kein API-Key → lokale Strategie (offline)“, Exit-Code 1 | |
+| D2 | Key holen (https://console.typesafe.ai/keys), `cp .env.example .env`, Key eintragen | `git status` zeigt `.env` **nicht** an (ist ignoriert) | |
+| D3 | `python -m blackjack_assistant jev-check` | „16 gegen 10, TC 0 → …“ mit Quelle `jev` und Wahrscheinlichkeiten (Summe ≈ 100 %) | |
+| D4 | `pytest tests/test_jev.py` | Auch `test_echte_jev_anfrage` läuft jetzt (statt übersprungen) und ist grün | |
+| D5 | `run --profile mock_casino --engine jev`, Runde spielen | Kurz „Lokale Strategie: Jev rechnet …“, danach Spielzug mit „Jev: Konfidenz …“ und Wahrscheinlichkeiten | |
+| D6 | Falschen Key eintragen, D5 wiederholen | Meldung „Jev lehnt den API-Key ab“, Empfehlungen kommen von der lokalen Strategie | |
+| D7 | Internet trennen, D5 wiederholen | „Jev nicht erreichbar … → lokale Strategie“, Programm läuft weiter | |

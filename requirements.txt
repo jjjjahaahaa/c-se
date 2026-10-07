@@ -9,6 +9,10 @@ mss>=9.0                         # Bildschirmaufnahme
 # tkinter ist Teil von Python (Linux: Paket python3-tk installieren)
 pynput>=1.7                      # globale Hotkeys
 
+# --- Jev (Phase 5, optional) --------------------------------------------
+requests>=2.31                   # HTTP-Anfragen an die Jev-API
+python-dotenv>=1.0               # lädt eine lokale .env (API-Key), die nie committet wird
+
 # --- Tests ------------------------------------------------------------
 pytest>=8.0
 # Browser-Tests für das Mock-Casino (Headless, kein Bildschirm nötig).

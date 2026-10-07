@@ -230,3 +230,47 @@ Level-2-Systeme, KO-Schwellen, Einsatzstaffelung.
   kaum belegt sind (F11 = Vollbild, F12 = Entwicklertools werden bewusst vermieden).
 - Der Worker wertet ca. 12 Bilder pro Sekunde aus. Gezählt wird trotzdem nur, wenn das Bild
   300 ms ruhig war.
+
+---
+
+## Phase 5 – Jev (optional)
+
+**Recherche** (Oktober 2026, Subagent mit Webzugriff): Jev ist das „System One“-Modell von
+TypeSafe AI. API: `POST https://api.typesafe.ai/v1/systemone`, Authentifizierung
+`Authorization: Bearer <Key>`, offizielle Umgebungsvariable `TYPESAFE_API_KEY`. Fragetyp
+„Choice“: Optionen als Schlüssel von `criteria`, Antwort mit `choice`, `probabilities` und
+`confidence`. Das Projekt patrickhaahr/jevjack (TypeScript) nutzt das JS-SDK und stellt eine
+Choice über alle fünf Aktionen. Die API war erreichbar (ohne Key: HTTP 403).
+
+**Umsetzung** (`strategy/jev.py`)
+- `JevEngine` mit derselben Schnittstelle wie die lokale Strategie (`decide`, `take_insurance`),
+  wählbar per Profil (`decision_engine`) oder `run --engine jev`.
+- Zustand an Jev: Spielerkarten, Summe, soft, Dealer-Karte, True Count, Restdecks, erlaubte
+  Aktionen, Anzahl Hände. Auswahl: nur die gerade erlaubten Aktionen.
+- Wahrscheinlichkeiten und Konfidenz werden im Overlay angezeigt.
+- API-Key nur aus der Umgebung (`TYPESAFE_API_KEY` oder `JEV_API_KEY`, optional `.env`).
+  Der Key erscheint nie in Fehlermeldungen oder Ausgaben. `.env` in `.gitignore`, Vorlage
+  `.env.example`.
+- Rückfall auf die lokale Strategie: ohne Key, bei ungültigem Key (danach keine weiteren
+  Versuche), Netzwerkfehler, Serverfehler oder unerwarteter Antwort.
+- Overlay: Anfrage im Hintergrund (das Bild friert nicht ein), Ergebnis wird pro Situation
+  zwischengespeichert. Simulation: blockierend.
+- Befehl `python -m blackjack_assistant jev-check` für eine Testanfrage.
+
+**Tests**: mit nachgebildeter API (keine echten Aufrufe): Request-Format, nur erlaubte Aktionen,
+Auswertung inkl. Wahrscheinlichkeiten, Zwischenspeicher, kein Key, ungültiger Key (403),
+Netzwerkfehler, kaputte Antwort, HTTP 529, Key nicht in Meldungen, Hintergrundmodus,
+`.env` ignoriert. Zusätzlich einmalig geprüft: Unser Request und das erwartete Antwortformat
+sind gültig nach der offiziellen OpenAPI-Spezifikation (api.typesafe.ai/openapi.json).
+Ein echter Test (`test_echte_jev_anfrage`) läuft automatisch, sobald ein Key gesetzt ist.
+
+**Offene Entscheidungen**
+- **Kein API-Key in der Entwicklungsumgebung** → Phase 5 ist mit nachgebildeter API fertig
+  gestellt; die echte Verbindung bitte lokal prüfen (LOCAL_TESTS D).
+- Direkte HTTP-Anfragen mit `requests` statt offiziellem Python-SDK (`typesafe-sdk`): weniger
+  Abhängigkeiten (das SDK braucht pydantic, httpx2, tenacity) und leicht testbar. Das Format
+  entspricht der Doku.
+- Anders als jevjack wird Jev keine fertige Basic-Strategy-Empfehlung mitgegeben (Auftrag:
+  Zustand = Hand, Dealer-Karte, True Count). Mit `JevEngine(advice=True)` lässt sich das einschalten.
+- Modell `jev-latest` (änderbar über `TYPESAFE_DEFAULT_MODEL`, für reproduzierbare Vergleiche
+  z. B. `jev-1.13.0`).
