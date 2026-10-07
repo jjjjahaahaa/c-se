@@ -1,5 +1,10 @@
 # Abhängigkeiten werden pro Phase ergänzt.
 
+# --- Bildschirmaufnahme und Erkennung (Phase 2) -------------------------
+numpy>=1.26
+opencv-python-headless>=4.8      # Template Matching (ohne eigene GUI, Fenster macht tkinter)
+mss>=9.0                         # Bildschirmaufnahme
+
 # --- Tests ------------------------------------------------------------
 pytest>=8.0
 # Browser-Tests für das Mock-Casino (Headless, kein Bildschirm nötig).

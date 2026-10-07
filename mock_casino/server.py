@@ -3,7 +3,7 @@
 Liefert die Dateien aus dem Ordner mock_casino/ aus und bietet zwei kleine API-Endpunkte:
 
   GET  /api/config  Einstellungen für das Spiel (Debug-Modus, Decks, Penetration, Seed)
-  POST /api/log     Ein Ereignis (aufgedeckte Karte, Mischen, Rundenende) als JSON.
+  POST /api/log     Ein Ereignis (aufgedeckte/ungesehene Karte, Mischen, Rundenende) als JSON.
                     Nur im Debug-Modus wird es als Zeile in die Ground-Truth-Datei geschrieben.
 
 Der Browser kann selbst keine Dateien schreiben, deshalb übernimmt der Server das Log.
@@ -34,7 +34,7 @@ DEFAULT_LOG_DIR = PROJECT_ROOT / "logs"
 MAX_BODY_BYTES = 64 * 1024
 
 # Erlaubte Ereignistypen im Ground-Truth-Log
-ALLOWED_EVENTS = {"card", "shuffle", "round_start", "round_end", "session_start"}
+ALLOWED_EVENTS = {"card", "unseen", "shuffle", "round_start", "round_end", "session_start"}
 
 
 class GroundTruthLog:
@@ -63,6 +63,7 @@ class CasinoConfig:
         penetration: float = 0.75,
         seed: int | None = None,
         shuffle_every_round: bool = False,
+        hide_hole_card: bool = False,
         log: GroundTruthLog | None = None,
     ):
         self.debug = debug
@@ -70,6 +71,7 @@ class CasinoConfig:
         self.penetration = penetration
         self.seed = seed
         self.shuffle_every_round = shuffle_every_round
+        self.hide_hole_card = hide_hole_card
         self.log = log
 
     def as_json(self) -> dict:
@@ -79,6 +81,7 @@ class CasinoConfig:
             "penetration": self.penetration,
             "seed": self.seed,
             "shuffleEveryRound": self.shuffle_every_round,
+            "hideHoleCard": self.hide_hole_card,
         }
 
 
@@ -116,8 +119,8 @@ class CasinoRequestHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def log_message(self, format: str, *args) -> None:  # noqa: A002 (Name von der Basisklasse)
-        # Die vielen Log-Zeilen für API-Aufrufe unterdrücken, nur Fehler ausgeben
-        if args and isinstance(args[0], str) and "/api/log" in args[0]:
+        # Nur Fehler ausgeben, nicht jede erfolgreiche Anfrage (das wären hunderte Zeilen)
+        if len(args) >= 2 and str(args[1]).startswith(("2", "3")):
             return
         super().log_message(format, *args)
 
@@ -166,6 +169,29 @@ def create_server(config: CasinoConfig, host: str = "127.0.0.1", port: int = 800
     return ThreadingHTTPServer((host, port), handler)
 
 
+class BackgroundServer:
+    """Startet den Server auf einem freien Port in einem Hintergrund-Thread
+    (für Tests und Tools wie tools/record_mock_session.py)."""
+
+    def __init__(self, config: CasinoConfig, port: int = 0):
+        self.config = config
+        self.httpd = create_server(config, port=port)  # Port 0 = Betriebssystem wählt frei
+        self.port = self.httpd.server_address[1]
+        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+
+    @property
+    def url(self) -> str:
+        return f"http://127.0.0.1:{self.port}"
+
+    def __enter__(self) -> "BackgroundServer":
+        self.thread.start()
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self.httpd.shutdown()
+        self.httpd.server_close()
+
+
 def default_log_path(log_dir: Path = DEFAULT_LOG_DIR) -> Path:
     """Pro Serverstart eine eigene Datei, z. B. logs/ground_truth_20261007_142501.jsonl."""
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -182,6 +208,11 @@ def main() -> None:
     parser.add_argument("--seed", type=int, help="Seed für reproduzierbares Mischen")
     parser.add_argument(
         "--shuffle-every-round", action="store_true", help="nach jeder Runde neu mischen"
+    )
+    parser.add_argument(
+        "--hide-hole-card",
+        action="store_true",
+        help="Hole Card nur aufdecken, wenn der Dealer spielen muss",
     )
     args = parser.parse_args()
 
@@ -200,6 +231,7 @@ def main() -> None:
         penetration=args.penetration,
         seed=args.seed,
         shuffle_every_round=args.shuffle_every_round,
+        hide_hole_card=args.hide_hole_card,
         log=log,
     )
     server = create_server(config, port=args.port)

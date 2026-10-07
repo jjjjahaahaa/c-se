@@ -19,6 +19,9 @@ export const DEFAULT_RULES = Object.freeze({
   dealerPeek: true,        // Dealer prüft bei A/10 auf Blackjack (US-Regel)
   insurance: true,
   shuffleEveryRound: false,
+  // Hole Card nur aufdecken, wenn der Dealer spielen muss (wie in manchen Online-Spielen).
+  // Sonst bleibt sie verdeckt und wird ungesehen abgeräumt.
+  hideUnneededHoleCard: false,
 });
 
 // Punktwert eines Rangs (Ass zunächst als 1)

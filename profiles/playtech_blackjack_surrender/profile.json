@@ -1,0 +1,78 @@
+{
+  "name": "playtech_blackjack_surrender",
+  "display_name": "Playtech Blackjack Surrender (Demo)",
+  "read_mode": "table",
+  "regions": {
+    "table": null,
+    "history": null
+  },
+  "areas": {
+    "dealer": [
+      0.0,
+      0.0,
+      1.0,
+      0.4
+    ],
+    "player": [
+      0.0,
+      0.4,
+      1.0,
+      0.45
+    ]
+  },
+  "recognition": {
+    "min_confidence": 0.8,
+    "uncertain_margin": 0.03,
+    "min_candidate": 0.75,
+    "stable_ms": 300,
+    "stable_threshold": 3,
+    "uncertain_frames": 3,
+    "orientation_check": true,
+    "table_scale": null,
+    "history_scale": null,
+    "card_brightness": 170
+  },
+  "rules": {
+    "decks": 6,
+    "penetration": 0.75,
+    "hit_soft_17": false,
+    "blackjack_pays": 1.5,
+    "double_any_two": true,
+    "double_after_split": true,
+    "max_hands": 2,
+    "resplit_aces": false,
+    "hit_split_aces": false,
+    "late_surrender": true,
+    "dealer_peek": true,
+    "insurance": true,
+    "seven_card_charlie": true,
+    "shuffle_every_round": true
+  },
+  "dealer_hole_card": true,
+  "counting": {
+    "system": "hi_lo"
+  },
+  "betting": {
+    "unit": 10,
+    "ramp": [
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        5,
+        8
+      ]
+    ]
+  },
+  "decision_engine": "strategy",
+  "notes": "Beispielprofil: 6 Decks, S17, Dealer-Peek, DAS, Late Surrender, kein Re-Split (max. 2 Hände), Seven-Card Charlie. 'Mischt jede Runde' ist standardmässig aktiv, weil solche Online-Spiele meist nach jeder Runde neu mischen – Zählen ist dann wirkungslos. Vor der ersten Nutzung kalibrieren (Templates) und Bereiche festlegen."
+}

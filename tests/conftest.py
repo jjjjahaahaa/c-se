@@ -2,36 +2,15 @@
 
 from __future__ import annotations
 
-import glob
-import os
-import threading
 from pathlib import Path
 
 import pytest
 
-from mock_casino.server import CasinoConfig, GroundTruthLog, create_server
+from mock_casino.server import BackgroundServer, CasinoConfig, GroundTruthLog
+from tools.browser import BrowserUnavailable, launch_chromium
 
 
-class RunningServer:
-    """Startet den Mock-Casino-Server auf einem freien Port in einem Thread."""
-
-    def __init__(self, config: CasinoConfig):
-        self.config = config
-        self.httpd = create_server(config, port=0)  # Port 0 = Betriebssystem wählt frei
-        self.port = self.httpd.server_address[1]
-        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
-
-    @property
-    def url(self) -> str:
-        return f"http://127.0.0.1:{self.port}"
-
-    def __enter__(self):
-        self.thread.start()
-        return self
-
-    def __exit__(self, *exc):
-        self.httpd.shutdown()
-        self.httpd.server_close()
+RunningServer = BackgroundServer  # kurzer Name für die Tests
 
 
 @pytest.fixture
@@ -54,25 +33,14 @@ def plain_server():
 # ----------------------------------------------------------------------
 
 
-def _launch_chromium(playwright):
-    """Chromium starten. Fällt auf eine vorinstallierte Version zurück, falls die
-    zur Playwright-Version passende fehlt (Pfad über BJ_CHROMIUM überschreibbar)."""
-    try:
-        return playwright.chromium.launch()
-    except Exception as first_error:  # noqa: BLE001 – wir probieren Alternativen
-        candidates = [os.environ.get("BJ_CHROMIUM")]
-        candidates += sorted(glob.glob("/opt/pw-browsers/chromium-*/chrome-linux/chrome"))
-        for path in candidates:
-            if path and Path(path).exists():
-                return playwright.chromium.launch(executable_path=path)
-        pytest.skip(f"Kein Chromium für Playwright verfügbar: {first_error}")
-
-
 @pytest.fixture(scope="session")
 def browser():
     sync_api = pytest.importorskip("playwright.sync_api", reason="Playwright nicht installiert")
     with sync_api.sync_playwright() as pw:
-        b = _launch_chromium(pw)
+        try:
+            b = launch_chromium(pw)
+        except BrowserUnavailable as err:
+            pytest.skip(str(err))
         yield b
         b.close()
 

@@ -9,4 +9,5 @@ testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
     "browser: Tests, die einen Headless-Browser (Playwright) brauchen",
+    "display: Tests, die ein Display brauchen (lokal oder xvfb-run)",
 ]

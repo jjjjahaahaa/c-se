@@ -32,6 +32,7 @@ const NOOP_HOOKS = {
   roundEnded() {},           // (summary)
   tableCleared() {},         // Tisch ist leer
   shuffled() {},             // (info) Schuh wurde neu gemischt
+  cardUnseen() {},           // (card, info) Karte wurde verdeckt abgeräumt (nie sichtbar)
 };
 
 export class Game {
@@ -65,6 +66,7 @@ export class Game {
     this.lastSummary = null;
     this.busy = false;             // läuft gerade eine Animation / Aktion?
     this.shufflePending = false;   // nach dieser Runde wird gemischt
+    this.unseenCount = 0;          // verdeckt abgeräumte Karten seit dem letzten Mischen
   }
 
   // ------------------------------------------------------------------
@@ -341,8 +343,16 @@ export class Game {
   async finishRound({ dealerPlays }) {
     this.phase = PHASE.DEALER;
 
-    // Hole Card wird immer aufgedeckt (wie im Casino) – wichtig für das Zählen
-    if (this.dealer.holeHidden) {
+    // Hole Card wird normalerweise immer aufgedeckt (wie im Casino) – wichtig für das Zählen.
+    // Mit hideUnneededHoleCard bleibt sie verdeckt, wenn der Dealer nicht spielen muss
+    // (alle Hände überkauft/aufgegeben oder Spieler-Blackjack). Sie gilt dann als "ungesehen".
+    const dealerBlackjack = isBlackjack(this.dealer.cards);
+    if (this.dealer.holeHidden && this.rules.hideUnneededHoleCard && !dealerPlays && !dealerBlackjack) {
+      this.unseenCount += 1;
+      this.hooks.cardUnseen(this.dealer.cards[1], {
+        target: 'dealer', hand: 0, hole: true, round: this.round, shoe: this.shoeNumber,
+      });
+    } else if (this.dealer.holeHidden) {
       this.dealer.holeHidden = false;
       this.reveal(this.dealer.cards[1], { target: 'dealer', hand: 0, hole: true });
       this.hooks.update();
@@ -419,6 +429,7 @@ export class Game {
     this.shoeNumber += 1;
     this.roundsSinceShuffle = 0;
     this.history = [];
+    this.unseenCount = 0;
     this.shufflePending = false;
     this.hooks.shuffled(info);
     this.hooks.update();

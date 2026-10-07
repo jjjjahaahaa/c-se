@@ -1,0 +1,78 @@
+{
+  "name": "mock_casino",
+  "display_name": "Mock-Casino (lokal)",
+  "read_mode": "history",
+  "regions": {
+    "table": null,
+    "history": null
+  },
+  "areas": {
+    "dealer": [
+      0.0,
+      0.0,
+      1.0,
+      0.33
+    ],
+    "player": [
+      0.0,
+      0.33,
+      1.0,
+      0.36
+    ]
+  },
+  "recognition": {
+    "min_confidence": 0.8,
+    "uncertain_margin": 0.03,
+    "min_candidate": 0.75,
+    "stable_ms": 300,
+    "stable_threshold": 3,
+    "uncertain_frames": 3,
+    "orientation_check": true,
+    "table_scale": 1.0,
+    "history_scale": 0.95,
+    "card_brightness": 170
+  },
+  "rules": {
+    "decks": 6,
+    "penetration": 0.75,
+    "hit_soft_17": false,
+    "blackjack_pays": 1.5,
+    "double_any_two": true,
+    "double_after_split": true,
+    "max_hands": 4,
+    "resplit_aces": false,
+    "hit_split_aces": false,
+    "late_surrender": true,
+    "dealer_peek": true,
+    "insurance": true,
+    "seven_card_charlie": false,
+    "shuffle_every_round": false
+  },
+  "dealer_hole_card": true,
+  "counting": {
+    "system": "hi_lo"
+  },
+  "betting": {
+    "unit": 10,
+    "ramp": [
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        5,
+        8
+      ]
+    ]
+  },
+  "decision_engine": "strategy",
+  "notes": "Eigenes Mock-Casino. Templates werden mit tools/generate_templates.py aus den SVGs erzeugt. Bildschirmbereiche einmal per 'select-region' festlegen (hängen von Bildschirm und Browserfenster ab)."
+}

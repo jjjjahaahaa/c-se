@@ -41,6 +41,7 @@ async function loadConfig() {
     shuffleEveryRound: params.has('every')
       ? params.get('every') === '1'
       : Boolean(server.shuffleEveryRound),
+    hideHoleCard: params.has('hide') ? params.get('hide') === '1' : Boolean(server.hideHoleCard),
     speed: num('speed', 1),
     clear: num('clear', 2500),
   };
@@ -139,6 +140,7 @@ class TableView {
     const untilCut = Math.max(0, shoe.cutCardPosition - shoe.dealt);
     $('shoe-text').textContent =
       `${shoe.dealt} von ${shoe.total} Karten gespielt · ` +
+      (this.game.unseenCount ? `${this.game.unseenCount} ungesehen · ` : '') +
       (this.game.rules.shuffleEveryRound
         ? 'Mischen nach jeder Runde'
         : `noch ${untilCut} Karten bis zur Schnittkarte`);
@@ -204,6 +206,7 @@ async function main() {
   const logger = new GroundTruthLogger(config.debug);
   $('debug-badge').hidden = !config.debug;
   $('opt-shuffle-every-round').checked = config.shuffleEveryRound;
+  $('opt-hide-hole').checked = config.hideHoleCard;
   $('opt-speed').value = String(config.speed);
   $('opt-clear').value = String(config.clear);
 
@@ -224,6 +227,14 @@ async function main() {
         round: info.round,
         shoe: info.shoe,
         seq: info.seq,          // Position im Verlauf seit dem letzten Mischen
+      });
+    },
+
+    // Karte wurde verdeckt abgeräumt: nicht im Verlauf, aber in der Ground Truth als "unseen"
+    cardUnseen: (card, info) => {
+      logger.log('unseen', {
+        rank: card.rank, suit: card.suit, target: info.target, hand: info.hand,
+        hole: info.hole, round: info.round, shoe: info.shoe,
       });
     },
 
@@ -259,6 +270,7 @@ async function main() {
       decks: config.decks,
       penetration: config.penetration,
       shuffleEveryRound: config.shuffleEveryRound,
+      hideUnneededHoleCard: config.hideHoleCard,
     },
     seed: config.seed,
     hooks,
@@ -275,6 +287,7 @@ async function main() {
     penetration: game.rules.penetration,
     seed: config.seed,
     shuffleEveryRound: game.rules.shuffleEveryRound,
+    hideHoleCard: game.rules.hideUnneededHoleCard,
   });
 
   // Fehler aus Spielaktionen nur anzeigen, nicht abstürzen
@@ -313,6 +326,9 @@ async function main() {
     game.rules.shuffleEveryRound = e.target.checked;
     view.render();
   });
+  $('opt-hide-hole').addEventListener('change', (e) => {
+    game.rules.hideUnneededHoleCard = e.target.checked;
+  });
   const applyTiming = () => {
     Object.assign(game.timing, timingFor(Number($('opt-speed').value), Number($('opt-clear').value)));
   };
@@ -336,8 +352,38 @@ async function main() {
   view.render();
 
   // Zugriff für automatisierte Tests und die Browser-Konsole
-  window.casino = { game, logger, view, cardLabel };
+  window.casino = { game, logger, view, cardLabel, autoplay: (rounds, pauseMs) => autoplay(game, view, rounds, pauseMs) };
   document.body.dataset.ready = '1';
+}
+
+// Automatisches Spielen mit echten Animationen – für Aufnahmen im Headless-Browser
+// (Erkennungstests ohne Bildschirm). Einfache Regeln, damit auch Double/Split/Surrender vorkommen.
+async function autoplay(game, view, rounds, pauseMs = 800) {
+  const waitIdle = async () => {
+    while (game.busy) await new Promise((r) => setTimeout(r, 20));
+  };
+  for (let i = 0; i < rounds; i++) {
+    await waitIdle();
+    if (game.phase !== PHASE.BETTING) break;
+    // Wie ein Mensch: kurz warten, bevor neu gesetzt wird (der Tisch ist dann leer)
+    if (i > 0 && pauseMs) await new Promise((r) => setTimeout(r, pauseMs));
+    if (game.bankroll < view.bet) game.bankroll = 1000;
+    await game.deal(view.bet);
+    if (game.phase === PHASE.INSURANCE) await game.insurance(false);
+    while (game.phase === PHASE.PLAYER) {
+      const a = game.availableActions();
+      const hand = game.currentHand;
+      const { total, soft } = handTotal(hand.cards);
+      const up = handTotal([game.dealer.cards[0]]).total;
+      const pair = hand.cards.length === 2 && hand.cards[0].rank === hand.cards[1].rank;
+      if (a.split && pair && ['A', '8'].includes(hand.cards[0].rank)) await game.split();
+      else if (a.surrender && total === 16 && up >= 10) await game.surrender();
+      else if (a.double && !soft && (total === 11 || (total === 10 && up <= 9))) await game.double();
+      else if (a.hit && (total < 12 || (total < 17 && up >= 7))) await game.hit();
+      else await game.stand();
+    }
+  }
+  await waitIdle();
 }
 
 // Animationstempo: 0 = keine Pausen (z. B. für Tests), 2 = doppelt so langsam

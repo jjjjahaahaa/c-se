@@ -166,7 +166,7 @@ python -m venv .venv
 # Windows:  .venv\Scripts\activate
 # Linux/macOS:  source .venv/bin/activate
 pip install -r requirements.txt
-python -m playwright install chromium   # nur für die Browser-Tests
+python -m playwright install chromium   # für Browser-Tests und Headless-Erkennungstests
 pytest
 ```
 
@@ -219,6 +219,41 @@ Weitere Typen: `session_start`, `round_start`, `round_end` (mit Ergebnis), `shuf
 
 Die Karten-SVGs werden mit `python tools/generate_card_svgs.py` erzeugt. Ränge sind
 Pfade statt Text, damit die Darstellung nicht von installierten Schriften abhängt.
+
+## Kartenerkennung (Phase 2)
+
+```bash
+python -m blackjack_assistant profiles                                   # Profile anzeigen
+python -m blackjack_assistant select-region --profile mock_casino --region table
+python -m blackjack_assistant select-region --profile mock_casino --region history
+python -m blackjack_assistant scale --profile mock_casino                 # Zoom/DPI ausmessen
+python -m blackjack_assistant calibrate --profile mein_spiel             # externes Spiel
+python -m blackjack_assistant replay --profile mock_casino --frames <Ordner>   # offline
+python tools/measure_accuracy.py                                         # Genauigkeit in %
+```
+
+**Ohne Bildschirm testen:** `python tools/record_mock_session.py --rounds 30` startet das
+Mock-Casino im Headless-Browser, lässt es mit echten Animationen spielen, schickt laufend
+Screenshots durch die Erkennung (Tisch- und Verlaufs-Modus gleichzeitig) und vergleicht mit
+der Ground Truth. Optionen: `--hide-hole`, `--every` (mischen jede Runde), `--pause 0`,
+`--save-frames <Ordner>` (Screenshots für `replay` speichern).
+
+**Ablauf der Erkennung**
+
+1. Bildschirm aufnehmen (mss), Tisch- und Verlaufsbereich ausschneiden.
+2. Warten, bis der Bereich 300 ms unverändert ist (Animationen).
+3. Helle Kartenflächen suchen und darin das Rangzeichen per Template Matching finden.
+   Gedrehte Ecken (unten rechts) werden aussortiert.
+4. Tisch-Modus: Karten nach Position verfolgen, jede nur einmal zählen, leerer Tisch =
+   Rundenende. Verlaufs-Modus: Liste mit der vorherigen vergleichen, leeres Panel = Mischen.
+5. Unsichere Treffer werden nicht gezählt, sondern gemeldet (Overlay gelb). Nicht gezeigte
+   Karten (z. B. Hole Card) gelten als „ungesehen“: kein Einfluss auf den Count, aber auf die
+   Restdecks.
+
+**Profil** (`profiles/<name>/profile.json`): `read_mode` (`table`/`history`), `regions`
+(Bildschirmpixel), `areas` (Dealer-/Spielerbereich als Anteile des Tisches), `recognition`
+(Mindest-Konfidenz, Skalierung, Stabilitätszeit …), `rules`, `counting`, `betting`.
+Templates liegen in `profiles/<name>/templates/<Rang>_<n>.png`.
 
 ## Konfiguration und Geheimnisse
 

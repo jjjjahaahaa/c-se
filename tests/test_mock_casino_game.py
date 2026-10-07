@@ -217,3 +217,58 @@ def test_viele_runden_mischen_an_der_schnittkarte(casino_page):
         assert info["cardsDealt"] >= 234
         assert info["cardsDealt"] < 312
     assert r["bankroll"] == pytest.approx(1e9 + r["netSum"])
+
+
+# ----------------------------------------------------------------------
+# Schalter "Hole Card nur aufdecken, wenn der Dealer spielt"
+# ----------------------------------------------------------------------
+
+HIDE = {"hideUnneededHoleCard": True}
+
+
+def test_hole_card_bleibt_bei_spieler_blackjack_verdeckt(casino_page):
+    rig(casino_page, ["A", "9", "K", "7"], HIDE)
+    r = js(casino_page, "await g.deal(10); return [g.history.length, g.unseenCount, g.lastSummary.hands[0].outcome];")
+    assert r == [3, 1, "blackjack"]
+
+
+def test_hole_card_bleibt_bei_ueberkauft_verdeckt(casino_page):
+    rig(casino_page, ["10", "9", "6", "8", "K"], HIDE)
+    r = js(casino_page, "await g.deal(10); await g.hit(); return [g.history.map((c) => c.rank), g.unseenCount];")
+    assert r == [["10", "9", "6", "K"], 1]
+
+
+def test_hole_card_wird_aufgedeckt_wenn_dealer_spielt(casino_page):
+    rig(casino_page, ["10", "9", "8", "8"], HIDE)
+    r = js(casino_page, "await g.deal(10); await g.stand(); return [g.history.length, g.unseenCount];")
+    assert r == [4, 0]
+
+
+def test_dealer_blackjack_wird_trotz_schalter_gezeigt(casino_page):
+    rig(casino_page, ["9", "K", "7", "A"], HIDE)
+    r = js(casino_page, "await g.deal(10); return [g.history.length, g.unseenCount];")
+    assert r == [4, 0]
+
+
+def test_sichtbare_plus_ungesehene_karten_ergeben_alle_gezogenen(casino_page):
+    r = casino_page.evaluate("""async () => {
+      const { Game } = await import('/js/game.js');
+      const problems = [];
+      const g = new Game({
+        seed: 21, bankroll: 1e9, rules: { hideUnneededHoleCard: true },
+        timing: { dealCard: 0, dealerCard: 0, clearTable: 0 },
+        hooks: { roundEnded: () => {
+          if (g.history.length + g.unseenCount !== g.shoe.dealt) problems.push(g.round);
+        } },
+      });
+      let unseenTotal = 0;
+      g.hooks.cardUnseen = () => { unseenTotal += 1; };
+      for (let i = 0; i < 300; i++) {
+        await g.deal(10);
+        if (g.phase === 'insurance') await g.insurance(false);
+        while (g.phase === 'player') await (i % 2 ? g.hit() : g.stand()).catch(() => g.stand());
+      }
+      return { problems, unseenTotal };
+    }""")
+    assert r["problems"] == []
+    assert r["unseenTotal"] > 10
