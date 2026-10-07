@@ -335,15 +335,69 @@ Kennzahlen, Betting Correlation, Bericht mit allen Grafiken.
 
 ---
 
+## Phase 6 – Ergänzung: Langlauf, flacher Einsatz, Signifikanz
+
+**Umsetzung**
+- **Langlauf mit 10 Mio. Runden** pro Zählsystem (230'000 Schuhe) und 1 Mio. Runden für die
+  exakte Strategie; 16 Varianten, parallel auf 4 Prozessen, Laufzeit 80 Minuten.
+- **Gleiche Schuhe für alle Varianten:** Der Schuh wird in Blöcke à 2'000 Schuhe mit festem Seed
+  aufgeteilt. Jede Variante bekommt exakt dieselbe Mischfolge – unabhängig davon, auf welchem
+  Prozessorkern ein Block läuft. Ergebnisse sind reproduzierbar.
+- **Statistik:** 95-%-Vertrauensintervalle mit dem Schuh als unabhängiger Einheit (die Runden
+  eines Schuhs hängen über den Count zusammen). Unterschiede werden **gepaart** gemessen (Schuh für
+  Schuh); die Schuh-Ergebnisse zweier Systeme korrelieren mit rund 0,9, dadurch werden die
+  Unterschiede etwa dreimal genauer als mit zwei unabhängigen Läufen. Für die Rangliste
+  (15 Paarvergleiche) gilt die Bonferroni-Grenze |z| ≥ 2,94.
+- **Flacher Einsatz:** jede Variante zusätzlich mit gleichen Spielzügen, aber immer 1 Einheit;
+  dazu Hi-Lo „nur Einsatzstaffelung“ (ohne Abweichungen).
+- **results.md** mit Lesehilfe (± = 95-%-Intervall), Tabelle der Einsatzstaffelung pro System,
+  Tabelle aller 22 Indizes pro System (umgerechnete Werte als Näherung gekennzeichnet), Abschnitt
+  „Woher kommt der Vorteil?“ und „Statistische Signifikanz“. Alle Texte werden aus
+  `results.json` erzeugt (`--report-only` schreibt Bericht und Langlauf-Grafiken neu).
+
+**Ergebnisse (Langlauf, Gewinn pro Runde ± 95 %)**
+
+| Variante | Spread 1–8 | flacher Einsatz |
+|---|---:|---:|
+| Basic Strategy | – | −0,377 % ± 0,070 % |
+| Hi-Lo | +1,039 % ± 0,147 % | −0,258 % ± 0,071 % |
+| KO | +1,058 % ± 0,151 % | −0,289 % ± 0,071 % |
+| Hi-Opt II | +1,272 % ± 0,164 % | −0,240 % ± 0,071 % |
+| Omega II | +1,305 % ± 0,163 % | −0,229 % ± 0,071 % |
+| Zen Count | +1,137 % ± 0,150 % | −0,237 % ± 0,071 % |
+| Wong Halves | +1,129 % ± 0,152 % | −0,250 % ± 0,071 % |
+| Exakt (1 Mio. Runden) | +2,539 % ± 0,616 % | +0,144 % ± 0,223 % |
+
+- **Der Vorteil kommt zu 92 % aus der Einsatzvariation.** Hi-Lo mit flachem Einsatz verliert
+  weiterhin (−0,26 %); die Abweichungen allein bringen nur +0,12 % ± 0,04 % (gesichert, aber klein).
+- **Gesicherte Rangstufen** (Bonferroni): {Omega II, Hi-Opt II} > {Zen, Wong Halves, KO, Hi-Lo}.
+  8 von 15 Paarvergleichen sind gesichert; innerhalb der Stufen nicht.
+- Jedes Zählsystem schlägt Basic Strategy (z ≈ 22–24); die exakte Strategie ist gesichert besser
+  als jedes Zählsystem (kleinster Abstand Omega II, +0,79 %, z = 3,4). Die Systeme holen 49–58 %
+  des maximal möglichen Zusatzgewinns (± ca. 11–12 Prozentpunkte).
+
+**Offene Entscheidungen**
+- Die Rangliste gilt für **diese** Einstellungen: umgerechnete Indizes und Einsatzschwellen
+  (Näherung), Spread 1–8, 75 % Penetration. Mit system-eigenen Indizes könnte sich die Reihenfolge
+  innerhalb und zwischen den Stufen ändern.
+- Rangstufen werden automatisch gebildet: nach Gewinn sortiert; ein System kommt in die aktuelle
+  Stufe, wenn es sich von keinem Mitglied nach Bonferroni unterscheidet.
+- Die exakte Strategie wurde mit 1 Mio. Runden gerechnet (10 Mio. hätten rund 12 Stunden gedauert).
+  Ihr Intervall ist deshalb breiter; der Vergleich mit den Systemen läuft auf den gemeinsamen
+  23'000 Schuhen.
+- Prozess-Pool mit „spawn“ statt „fork“ (sicher in Programmen mit mehreren Threads, gleiches
+  Verhalten wie unter Windows).
+
+---
+
 ## Gesamtübersicht der Tests (Stand Phase 6)
 
-354 Tests in 15 Dateien. Ausgeführt in der Entwicklungsumgebung (Linux, ohne echten Bildschirm):
+360 Tests in 15 Dateien (nach der Ergänzung). Ausgeführt in der Entwicklungsumgebung (Linux, ohne echten Bildschirm):
 
 | Umgebung | Ergebnis | Übersprungen (Grund) |
 |---|---|---|
-| Python 3.12 auf virtuellem Bildschirm (`xvfb-run`), alle Tests | **353 grün** | 1: echter Jev-Test (kein API-Key) |
-| Python 3.13 ohne Display, alle Tests | **344 grün** | 2: GUI-Datei mit 9 Tests (kein Display), echter Jev-Test |
-| Python 3.11 ohne Display, ohne Browser-Tests | **319 grün** | wie oben; 25 Browser-Tests abgewählt |
+| Python 3.12 auf virtuellem Bildschirm (`xvfb-run`), alle Tests | **359 grün** | 1: echter Jev-Test (kein API-Key) |
+| Python 3.13 ohne Display, ohne Browser-Tests | **325 grün** | 2: GUI-Datei mit 9 Tests (kein Display), echter Jev-Test; 25 Browser-Tests abgewählt |
 
 | Datei | Tests | Inhalt |
 |---|---:|---|
@@ -352,7 +406,7 @@ Kennzahlen, Betting Correlation, Bericht mit allen Grafiken.
 | test_recognition_parts.py | 30 | Stabilität, Bereiche, Profile, Kalibrierung, Log, Genauigkeitsmessung, Pipeline |
 | test_counting.py | 26 | sechs Zählsysteme, True Count, ungesehene Karten, Mischen, Statistik |
 | test_tracking.py | 21 | Tisch-Modus (einmal zählen, Split, Korrektur, Rundenende) und Verlaufs-Modus |
-| test_simulation.py | 21 | Simulator-Regeln, Seed, Spieler, Hausvorteil, Bericht |
+| test_simulation.py | 27 | Simulator-Regeln, Seed, Spieler, Hausvorteil, gleiche Schuhe, gepaarter Vergleich, Langlauf, Bericht |
 | test_mock_casino_game.py | 20 | Spielregeln des Mock-Casinos im Headless-Browser |
 | test_recognition_images.py | 12 | Erkennung auf Screenshots, gedrehte Ecken, 125 %-Zoom, Kalibrierung B/D/K |
 | test_app.py | 12 | Assistant, Worker-Thread, Overlay-Texte |

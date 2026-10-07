@@ -1,15 +1,389 @@
 {
- "created": "2026-10-07 10:24",
+ "created": "2026-10-07 12:26",
  "seed": 2026,
- "runtime_s": 522.7350323200226,
+ "runtime_s": 4813.022877693176,
+ "settings": {
+  "hands": 10000,
+  "big_rounds": 10000000,
+  "exact_rounds": 1000000,
+  "block_shoes": 2000,
+  "jobs": 4,
+  "ramp": [
+   [
+    2,
+    2
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    6
+   ],
+   [
+    5,
+    8
+   ]
+  ]
+ },
+ "ramp_table": {
+  "hi_lo": [
+   2.0,
+   3.0,
+   4.0,
+   5.0
+  ],
+  "ko": [
+   -3.5,
+   0.25,
+   4.0,
+   7.75
+  ],
+  "hi_opt_2": [
+   3.0,
+   4.5,
+   6.0,
+   7.5
+  ],
+  "omega_2": [
+   3.2,
+   4.800000000000001,
+   6.4,
+   8.0
+  ],
+  "zen": [
+   3.4,
+   5.1,
+   6.8,
+   8.5
+  ],
+  "wong_halves": [
+   2.0,
+   3.0,
+   4.0,
+   5.0
+  ]
+ },
+ "index_table": [
+  {
+   "name": "Versicherung",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 3.0,
+   "systems": {
+    "hi_lo": 3.0,
+    "ko": 3.0,
+    "hi_opt_2": 4.5,
+    "omega_2": 4.800000000000001,
+    "zen": 5.1,
+    "wong_halves": 3.0
+   }
+  },
+  {
+   "name": "16 gegen 10 stehen",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 0.0,
+   "systems": {
+    "hi_lo": 0.0,
+    "ko": -11.0,
+    "hi_opt_2": 0.0,
+    "omega_2": 0.0,
+    "zen": 0.0,
+    "wong_halves": 0.0
+   }
+  },
+  {
+   "name": "15 gegen 10 stehen",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 4.0,
+   "systems": {
+    "hi_lo": 4.0,
+    "ko": 4.0,
+    "hi_opt_2": 6.0,
+    "omega_2": 6.4,
+    "zen": 6.8,
+    "wong_halves": 4.0
+   }
+  },
+  {
+   "name": "10,10 gegen 5 teilen",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 5.0,
+   "systems": {
+    "hi_lo": 5.0,
+    "ko": 7.75,
+    "hi_opt_2": 7.5,
+    "omega_2": 8.0,
+    "zen": 8.5,
+    "wong_halves": 5.0
+   }
+  },
+  {
+   "name": "10,10 gegen 6 teilen",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 4.0,
+   "systems": {
+    "hi_lo": 4.0,
+    "ko": 4.0,
+    "hi_opt_2": 6.0,
+    "omega_2": 6.4,
+    "zen": 6.8,
+    "wong_halves": 4.0
+   }
+  },
+  {
+   "name": "10 gegen 10 verdoppeln",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 4.0,
+   "systems": {
+    "hi_lo": 4.0,
+    "ko": 4.0,
+    "hi_opt_2": 6.0,
+    "omega_2": 6.4,
+    "zen": 6.8,
+    "wong_halves": 4.0
+   }
+  },
+  {
+   "name": "12 gegen 3 stehen",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 2.0,
+   "systems": {
+    "hi_lo": 2.0,
+    "ko": -3.5,
+    "hi_opt_2": 3.0,
+    "omega_2": 3.2,
+    "zen": 3.4,
+    "wong_halves": 2.0
+   }
+  },
+  {
+   "name": "12 gegen 2 stehen",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 3.0,
+   "systems": {
+    "hi_lo": 3.0,
+    "ko": 0.25,
+    "hi_opt_2": 4.5,
+    "omega_2": 4.800000000000001,
+    "zen": 5.1,
+    "wong_halves": 3.0
+   }
+  },
+  {
+   "name": "11 gegen Ass verdoppeln",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 1.0,
+   "systems": {
+    "hi_lo": 1.0,
+    "ko": -7.25,
+    "hi_opt_2": 1.5,
+    "omega_2": 1.6,
+    "zen": 1.7,
+    "wong_halves": 1.0
+   }
+  },
+  {
+   "name": "9 gegen 2 verdoppeln",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 1.0,
+   "systems": {
+    "hi_lo": 1.0,
+    "ko": -7.25,
+    "hi_opt_2": 1.5,
+    "omega_2": 1.6,
+    "zen": 1.7,
+    "wong_halves": 1.0
+   }
+  },
+  {
+   "name": "10 gegen Ass verdoppeln",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 4.0,
+   "systems": {
+    "hi_lo": 4.0,
+    "ko": 4.0,
+    "hi_opt_2": 6.0,
+    "omega_2": 6.4,
+    "zen": 6.8,
+    "wong_halves": 4.0
+   }
+  },
+  {
+   "name": "9 gegen 7 verdoppeln",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 3.0,
+   "systems": {
+    "hi_lo": 3.0,
+    "ko": 0.25,
+    "hi_opt_2": 4.5,
+    "omega_2": 4.800000000000001,
+    "zen": 5.1,
+    "wong_halves": 3.0
+   }
+  },
+  {
+   "name": "16 gegen 9 stehen",
+   "group": "I18",
+   "when": ">=",
+   "hilo": 5.0,
+   "systems": {
+    "hi_lo": 5.0,
+    "ko": 7.75,
+    "hi_opt_2": 7.5,
+    "omega_2": 8.0,
+    "zen": 8.5,
+    "wong_halves": 5.0
+   }
+  },
+  {
+   "name": "13 gegen 2 ziehen",
+   "group": "I18",
+   "when": "<",
+   "hilo": -1.0,
+   "systems": {
+    "hi_lo": -1.0,
+    "ko": -14.75,
+    "hi_opt_2": -1.5,
+    "omega_2": -1.6,
+    "zen": -1.7,
+    "wong_halves": -1.0
+   }
+  },
+  {
+   "name": "12 gegen 4 ziehen",
+   "group": "I18",
+   "when": "<",
+   "hilo": 0.0,
+   "systems": {
+    "hi_lo": 0.0,
+    "ko": -11.0,
+    "hi_opt_2": 0.0,
+    "omega_2": 0.0,
+    "zen": 0.0,
+    "wong_halves": 0.0
+   }
+  },
+  {
+   "name": "12 gegen 5 ziehen",
+   "group": "I18",
+   "when": "<",
+   "hilo": -2.0,
+   "systems": {
+    "hi_lo": -2.0,
+    "ko": -18.5,
+    "hi_opt_2": -3.0,
+    "omega_2": -3.2,
+    "zen": -3.4,
+    "wong_halves": -2.0
+   }
+  },
+  {
+   "name": "12 gegen 6 ziehen",
+   "group": "I18",
+   "when": "<",
+   "hilo": -1.0,
+   "systems": {
+    "hi_lo": -1.0,
+    "ko": -14.75,
+    "hi_opt_2": -1.5,
+    "omega_2": -1.6,
+    "zen": -1.7,
+    "wong_halves": -1.0
+   }
+  },
+  {
+   "name": "13 gegen 3 ziehen",
+   "group": "I18",
+   "when": "<",
+   "hilo": -2.0,
+   "systems": {
+    "hi_lo": -2.0,
+    "ko": -18.5,
+    "hi_opt_2": -3.0,
+    "omega_2": -3.2,
+    "zen": -3.4,
+    "wong_halves": -2.0
+   }
+  },
+  {
+   "name": "14 gegen 10 aufgeben",
+   "group": "Fab4",
+   "when": ">=",
+   "hilo": 3.0,
+   "systems": {
+    "hi_lo": 3.0,
+    "ko": 0.25,
+    "hi_opt_2": 4.5,
+    "omega_2": 4.800000000000001,
+    "zen": 5.1,
+    "wong_halves": 3.0
+   }
+  },
+  {
+   "name": "15 gegen 10 aufgeben",
+   "group": "Fab4",
+   "when": ">=",
+   "hilo": 0.0,
+   "systems": {
+    "hi_lo": 0.0,
+    "ko": -11.0,
+    "hi_opt_2": 0.0,
+    "omega_2": 0.0,
+    "zen": 0.0,
+    "wong_halves": 0.0
+   }
+  },
+  {
+   "name": "15 gegen 9 aufgeben",
+   "group": "Fab4",
+   "when": ">=",
+   "hilo": 2.0,
+   "systems": {
+    "hi_lo": 2.0,
+    "ko": -3.5,
+    "hi_opt_2": 3.0,
+    "omega_2": 3.2,
+    "zen": 3.4,
+    "wong_halves": 2.0
+   }
+  },
+  {
+   "name": "15 gegen Ass aufgeben",
+   "group": "Fab4",
+   "when": ">=",
+   "hilo": 1.0,
+   "systems": {
+    "hi_lo": 1.0,
+    "ko": -7.25,
+    "hi_opt_2": 1.5,
+    "omega_2": 1.6,
+    "zen": 1.7,
+    "wong_halves": 1.0
+   }
+  }
+ ],
  "runs_10k": [
   {
+   "key": "basic",
    "name": "Basic Strategy (ohne Zählen)",
    "mode": "shoe",
    "rounds": 10000,
    "net": -211.0,
    "ev_per_round": -0.0211,
-   "ci95": 0.0224,
+   "ci95": 0.02319,
    "ev_per_unit_bet": -0.0211,
    "sd_per_round": 1.143,
    "mean_bet": 1.0,
@@ -17,12 +391,13 @@
    "shuffles": 230
   },
   {
+   "key": "hi_lo",
    "name": "Hi-Lo",
    "mode": "shoe",
    "rounds": 10000,
    "net": 262.0,
    "ev_per_round": 0.0262,
-   "ci95": 0.04804,
+   "ci95": 0.03754,
    "ev_per_unit_bet": 0.01702,
    "sd_per_round": 2.4511,
    "mean_bet": 1.539,
@@ -30,12 +405,13 @@
    "shuffles": 230
   },
   {
+   "key": "ko",
    "name": "KO (Knock-Out)",
    "mode": "shoe",
    "rounds": 10000,
    "net": 199.0,
    "ev_per_round": 0.0199,
-   "ci95": 0.04916,
+   "ci95": 0.04055,
    "ev_per_unit_bet": 0.01247,
    "sd_per_round": 2.5084,
    "mean_bet": 1.596,
@@ -43,12 +419,13 @@
    "shuffles": 230
   },
   {
+   "key": "hi_opt_2",
    "name": "Hi-Opt II",
    "mode": "shoe",
    "rounds": 10000,
    "net": 319.5,
    "ev_per_round": 0.03195,
-   "ci95": 0.05268,
+   "ci95": 0.04516,
    "ev_per_unit_bet": 0.01919,
    "sd_per_round": 2.6875,
    "mean_bet": 1.665,
@@ -56,12 +433,13 @@
    "shuffles": 230
   },
   {
+   "key": "omega_2",
    "name": "Omega II",
    "mode": "shoe",
    "rounds": 10000,
    "net": 238.5,
    "ev_per_round": 0.02385,
-   "ci95": 0.05087,
+   "ci95": 0.04067,
    "ev_per_unit_bet": 0.01472,
    "sd_per_round": 2.5956,
    "mean_bet": 1.621,
@@ -69,12 +447,13 @@
    "shuffles": 230
   },
   {
+   "key": "zen",
    "name": "Zen Count",
    "mode": "shoe",
    "rounds": 10000,
    "net": 189.0,
    "ev_per_round": 0.0189,
-   "ci95": 0.04773,
+   "ci95": 0.03747,
    "ev_per_unit_bet": 0.01228,
    "sd_per_round": 2.4352,
    "mean_bet": 1.54,
@@ -82,12 +461,13 @@
    "shuffles": 230
   },
   {
+   "key": "wong_halves",
    "name": "Wong Halves",
    "mode": "shoe",
    "rounds": 10000,
    "net": 213.0,
    "ev_per_round": 0.0213,
-   "ci95": 0.04811,
+   "ci95": 0.03574,
    "ev_per_unit_bet": 0.01382,
    "sd_per_round": 2.4547,
    "mean_bet": 1.542,
@@ -95,12 +475,13 @@
    "shuffles": 230
   },
   {
+   "key": "exact",
    "name": "Exakt (Restzusammensetzung)",
    "mode": "shoe",
    "rounds": 10000,
    "net": 266.0,
    "ev_per_round": 0.0266,
-   "ci95": 0.06196,
+   "ci95": 0.05655,
    "ev_per_unit_bet": 0.01383,
    "sd_per_round": 3.1614,
    "mean_bet": 1.923,
@@ -108,6 +489,7 @@
    "shuffles": 230
   },
   {
+   "key": "basic",
    "name": "Basic Strategy (ohne Zählen)",
    "mode": "every_round",
    "rounds": 10000,
@@ -121,6 +503,7 @@
    "shuffles": 10000
   },
   {
+   "key": "hi_lo",
    "name": "Hi-Lo",
    "mode": "every_round",
    "rounds": 10000,
@@ -134,6 +517,7 @@
    "shuffles": 10000
   },
   {
+   "key": "ko",
    "name": "KO (Knock-Out)",
    "mode": "every_round",
    "rounds": 10000,
@@ -147,6 +531,7 @@
    "shuffles": 10000
   },
   {
+   "key": "hi_opt_2",
    "name": "Hi-Opt II",
    "mode": "every_round",
    "rounds": 10000,
@@ -160,6 +545,7 @@
    "shuffles": 10000
   },
   {
+   "key": "omega_2",
    "name": "Omega II",
    "mode": "every_round",
    "rounds": 10000,
@@ -173,6 +559,7 @@
    "shuffles": 10000
   },
   {
+   "key": "zen",
    "name": "Zen Count",
    "mode": "every_round",
    "rounds": 10000,
@@ -186,6 +573,7 @@
    "shuffles": 10000
   },
   {
+   "key": "wong_halves",
    "name": "Wong Halves",
    "mode": "every_round",
    "rounds": 10000,
@@ -199,6 +587,7 @@
    "shuffles": 10000
   },
   {
+   "key": "exact",
    "name": "Exakt (Restzusammensetzung)",
    "mode": "every_round",
    "rounds": 10000,
@@ -212,118 +601,714 @@
    "shuffles": 10000
   }
  ],
- "runs_big": [
-  {
-   "name": "Basic Strategy (ohne Zählen)",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": -849.5,
-   "ev_per_round": -0.0017,
-   "ci95": 0.00316,
-   "ev_per_unit_bet": -0.0017,
-   "sd_per_round": 1.1417,
-   "mean_bet": 1.0,
-   "max_drawdown": 1167.5,
-   "shuffles": 11479
+ "jev_note": "nicht simuliert – kein API-Key vorhanden. Mit Key: `python -m blackjack_assistant simulate` erneut ausführen; die Variante „Jev + Hi-Lo“ erscheint dann automatisch.",
+ "longrun": {
+  "variants": {
+   "basic": {
+    "label": "Basic Strategy",
+    "rounds": 10019516,
+    "shoes": 230000,
+    "ev_per_round": -0.0037663994947460537,
+    "ci95": 0.0007027324198616027,
+    "ev_per_unit_bet": -0.0037663994947460537,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.140750683021897,
+    "rounds_per_shoe": 43.56311304347826
+   },
+   "hi_lo:spread_only": {
+    "label": "Hi-Lo – nur Einsatzstaffelung",
+    "rounds": 10019516,
+    "shoes": 230000,
+    "ev_per_round": 0.006669982861447599,
+    "ci95": 0.001446899692305743,
+    "ev_per_unit_bet": 0.004447232551000601,
+    "mean_bet": 1.4998052800155217,
+    "sd_per_round": 2.341740984048465,
+    "rounds_per_shoe": 43.56311304347826
+   },
+   "hi_lo": {
+    "label": "Hi-Lo",
+    "rounds": 10006908,
+    "shoes": 230000,
+    "ev_per_round": 0.010393620087243732,
+    "ci95": 0.0014748469441362554,
+    "ev_per_unit_bet": 0.006909022742089146,
+    "mean_bet": 1.5043545918479515,
+    "sd_per_round": 2.4018802432694595,
+    "rounds_per_shoe": 43.50829565217391
+   },
+   "hi_lo:flat": {
+    "label": "Hi-Lo – flacher Einsatz",
+    "rounds": 10006908,
+    "shoes": 230000,
+    "ev_per_round": -0.0025807672060140854,
+    "ci95": 0.0007062047939828265,
+    "ev_per_unit_bet": -0.0025807672060140854,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.147212927004717,
+    "rounds_per_shoe": 43.50829565217391
+   },
+   "ko": {
+    "label": "KO (Knock-Out)",
+    "rounds": 10004824,
+    "shoes": 230000,
+    "ev_per_round": 0.010579896258045118,
+    "ci95": 0.0015140778487734256,
+    "ev_per_unit_bet": 0.006737665171458779,
+    "mean_bet": 1.5702615058495781,
+    "sd_per_round": 2.456054341236381,
+    "rounds_per_shoe": 43.499234782608696
+   },
+   "ko:flat": {
+    "label": "KO (Knock-Out) – flacher Einsatz",
+    "rounds": 10004824,
+    "shoes": 230000,
+    "ev_per_round": -0.002888506584423674,
+    "ci95": 0.0007079415971407484,
+    "ev_per_unit_bet": -0.002888506584423674,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.14737199329562,
+    "rounds_per_shoe": 43.499234782608696
+   },
+   "hi_opt_2": {
+    "label": "Hi-Opt II",
+    "rounds": 10004990,
+    "shoes": 230000,
+    "ev_per_round": 0.01272420062388868,
+    "ci95": 0.0016398158945831892,
+    "ev_per_unit_bet": 0.007838808306314832,
+    "mean_bet": 1.6232315074777686,
+    "sd_per_round": 2.661163904020014,
+    "rounds_per_shoe": 43.49995652173913
+   },
+   "hi_opt_2:flat": {
+    "label": "Hi-Opt II – flacher Einsatz",
+    "rounds": 10004990,
+    "shoes": 230000,
+    "ev_per_round": -0.002399502648178559,
+    "ci95": 0.0007069778902229064,
+    "ev_per_unit_bet": -0.002399502648178559,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.1475468942229101,
+    "rounds_per_shoe": 43.49995652173913
+   },
+   "omega_2": {
+    "label": "Omega II",
+    "rounds": 10004477,
+    "shoes": 230000,
+    "ev_per_round": 0.01305165677326261,
+    "ci95": 0.0016301240063062185,
+    "ev_per_unit_bet": 0.008066800957871993,
+    "mean_bet": 1.6179470451079052,
+    "sd_per_round": 2.6513187331703167,
+    "rounds_per_shoe": 43.49772608695652
+   },
+   "omega_2:flat": {
+    "label": "Omega II – flacher Einsatz",
+    "rounds": 10004477,
+    "shoes": 230000,
+    "ev_per_round": -0.0022897748677916897,
+    "ci95": 0.0007068132399132284,
+    "ev_per_unit_bet": -0.0022897748677916897,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.1475814825478143,
+    "rounds_per_shoe": 43.49772608695652
+   },
+   "zen": {
+    "label": "Zen Count",
+    "rounds": 10004582,
+    "shoes": 230000,
+    "ev_per_round": 0.011370090224659062,
+    "ci95": 0.0014968127087383268,
+    "ev_per_unit_bet": 0.00750771839096315,
+    "mean_bet": 1.5144534774166476,
+    "sd_per_round": 2.434304673263365,
+    "rounds_per_shoe": 43.49818260869565
+   },
+   "zen:flat": {
+    "label": "Zen Count – flacher Einsatz",
+    "rounds": 10004582,
+    "shoes": 230000,
+    "ev_per_round": -0.0023677650900357458,
+    "ci95": 0.0007067930827362842,
+    "ev_per_unit_bet": -0.0023677650900357458,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.147012245446611,
+    "rounds_per_shoe": 43.49818260869565
+   },
+   "wong_halves": {
+    "label": "Wong Halves",
+    "rounds": 10005753,
+    "shoes": 230000,
+    "ev_per_round": 0.011289455176436996,
+    "ci95": 0.0015214842264845104,
+    "ev_per_unit_bet": 0.007356233706287003,
+    "mean_bet": 1.5346786993442671,
+    "sd_per_round": 2.475093515708712,
+    "rounds_per_shoe": 43.50327391304348
+   },
+   "wong_halves:flat": {
+    "label": "Wong Halves – flacher Einsatz",
+    "rounds": 10005753,
+    "shoes": 230000,
+    "ev_per_round": -0.002498662519452559,
+    "ci95": 0.0007062822874364042,
+    "ev_per_unit_bet": -0.002498662519452559,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.147287106300581,
+    "rounds_per_shoe": 43.50327391304348
+   },
+   "exact": {
+    "label": "Exakt",
+    "rounds": 1000067,
+    "shoes": 23000,
+    "ev_per_round": 0.025387299050963586,
+    "ci95": 0.006157458434221628,
+    "ev_per_unit_bet": 0.013321398345437097,
+    "mean_bet": 1.9057533145279266,
+    "sd_per_round": 3.1829047539512274,
+    "rounds_per_shoe": 43.48117391304348
+   },
+   "exact:flat": {
+    "label": "Exakt – flacher Einsatz",
+    "rounds": 1000067,
+    "shoes": 23000,
+    "ev_per_round": 0.0014409034594682155,
+    "ci95": 0.0022316961611634372,
+    "ev_per_unit_bet": 0.0014409034594682155,
+    "mean_bet": 1.0,
+    "sd_per_round": 1.144713775968901,
+    "rounds_per_shoe": 43.48117391304348
+   }
   },
-  {
-   "name": "Hi-Lo",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": 6863.0,
-   "ev_per_round": 0.01373,
-   "ci95": 0.00658,
-   "ev_per_unit_bet": 0.00919,
-   "sd_per_round": 2.3748,
-   "mean_bet": 1.494,
-   "max_drawdown": 1192.0,
-   "shuffles": 11493,
-   "share_of_max": 0.5502
-  },
-  {
-   "name": "KO (Knock-Out)",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": 7028.0,
-   "ev_per_round": 0.01406,
-   "ci95": 0.00672,
-   "ev_per_unit_bet": 0.00902,
-   "sd_per_round": 2.426,
-   "mean_bet": 1.558,
-   "max_drawdown": 1385.5,
-   "shuffles": 11499,
-   "share_of_max": 0.5619
-  },
-  {
-   "name": "Hi-Opt II",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": 7821.0,
-   "ev_per_round": 0.01564,
-   "ci95": 0.00727,
-   "ev_per_unit_bet": 0.00972,
-   "sd_per_round": 2.6227,
-   "mean_bet": 1.61,
-   "max_drawdown": 1455.0,
-   "shuffles": 11498,
-   "share_of_max": 0.6185
-  },
-  {
-   "name": "Omega II",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": 7800.5,
-   "ev_per_round": 0.0156,
-   "ci95": 0.00727,
-   "ev_per_unit_bet": 0.00971,
-   "sd_per_round": 2.6217,
-   "mean_bet": 1.607,
-   "max_drawdown": 1291.0,
-   "shuffles": 11495,
-   "share_of_max": 0.617
-  },
-  {
-   "name": "Zen Count",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": 7143.0,
-   "ev_per_round": 0.01429,
-   "ci95": 0.00665,
-   "ev_per_unit_bet": 0.00951,
-   "sd_per_round": 2.4,
-   "mean_bet": 1.503,
-   "max_drawdown": 1369.0,
-   "shuffles": 11497,
-   "share_of_max": 0.5701
-  },
-  {
-   "name": "Wong Halves",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": 6321.0,
-   "ev_per_round": 0.01264,
-   "ci95": 0.00679,
-   "ev_per_unit_bet": 0.00829,
-   "sd_per_round": 2.4484,
-   "mean_bet": 1.526,
-   "max_drawdown": 1054.5,
-   "shuffles": 11494,
-   "share_of_max": 0.5115
-  },
-  {
-   "name": "Exakt (Restzusammensetzung)",
-   "mode": "shoe",
-   "rounds": 500000,
-   "net": 13169.0,
-   "ev_per_round": 0.02634,
-   "ci95": 0.00879,
-   "ev_per_unit_bet": 0.01385,
-   "sd_per_round": 3.1728,
-   "mean_bet": 1.901,
-   "max_drawdown": 1065.5,
-   "shuffles": 11500
+  "vs_basic": [
+   {
+    "a": "hi_lo",
+    "b": "basic",
+    "a_label": "Hi-Lo",
+    "b_label": "Basic Strategy",
+    "diff": 0.014160019581989786,
+    "ci95": 0.0012364127767125579,
+    "z": 22.44649128730825,
+    "shoes": 230000,
+    "corr": 0.5500318977040317
+   },
+   {
+    "a": "ko",
+    "b": "basic",
+    "a_label": "KO (Knock-Out)",
+    "b_label": "Basic Strategy",
+    "diff": 0.014346295752791172,
+    "ci95": 0.0012713969546614883,
+    "z": 22.11600641776755,
+    "shoes": 230000,
+    "corr": 0.5496574526931246
+   },
+   {
+    "a": "hi_opt_2",
+    "b": "basic",
+    "a_label": "Hi-Opt II",
+    "b_label": "Basic Strategy",
+    "diff": 0.016490600118634735,
+    "ci95": 0.0014010912913353442,
+    "z": 23.06843442022647,
+    "shoes": 230000,
+    "corr": 0.5291642503305537
+   },
+   {
+    "a": "omega_2",
+    "b": "basic",
+    "a_label": "Omega II",
+    "b_label": "Basic Strategy",
+    "diff": 0.016818056268008665,
+    "ci95": 0.0013906028586525812,
+    "z": 23.703953023087042,
+    "shoes": 230000,
+    "corr": 0.5312586563242361
+   },
+   {
+    "a": "zen",
+    "b": "basic",
+    "a_label": "Zen Count",
+    "b_label": "Basic Strategy",
+    "diff": 0.015136489719405115,
+    "ci95": 0.0012604736832815668,
+    "z": 23.53636996146398,
+    "shoes": 230000,
+    "corr": 0.5444257719424572
+   },
+   {
+    "a": "wong_halves",
+    "b": "basic",
+    "a_label": "Wong Halves",
+    "b_label": "Basic Strategy",
+    "diff": 0.015055854671183049,
+    "ci95": 0.0012847528304154121,
+    "z": 22.968568308356396,
+    "shoes": 230000,
+    "corr": 0.54152025987589
+   }
+  ],
+  "spread_vs_flat": [
+   {
+    "a": "hi_lo",
+    "b": "hi_lo:flat",
+    "a_label": "Hi-Lo",
+    "b_label": "Hi-Lo – flacher Einsatz",
+    "diff": 0.012974387293257818,
+    "ci95": 0.0010891525371723556,
+    "z": 23.347815066255173,
+    "shoes": 230000,
+    "corr": 0.7140782225010107
+   },
+   {
+    "a": "ko",
+    "b": "ko:flat",
+    "a_label": "KO (Knock-Out)",
+    "b_label": "KO (Knock-Out) – flacher Einsatz",
+    "diff": 0.013468402842468792,
+    "ci95": 0.0011099153349333306,
+    "z": 23.78342192228755,
+    "shoes": 230000,
+    "corr": 0.7284156068942261
+   },
+   {
+    "a": "hi_opt_2",
+    "b": "hi_opt_2:flat",
+    "a_label": "Hi-Opt II",
+    "b_label": "Hi-Opt II – flacher Einsatz",
+    "diff": 0.015123703272067239,
+    "ci95": 0.0012562625816970212,
+    "z": 23.595317087206595,
+    "shoes": 230000,
+    "corr": 0.694553652012
+   },
+   {
+    "a": "omega_2",
+    "b": "omega_2:flat",
+    "a_label": "Omega II",
+    "b_label": "Omega II – flacher Einsatz",
+    "diff": 0.015341431641054299,
+    "ci95": 0.0012469427575883961,
+    "z": 24.113900611669234,
+    "shoes": 230000,
+    "corr": 0.6951153058853673
+   },
+   {
+    "a": "zen",
+    "b": "zen:flat",
+    "a_label": "Zen Count",
+    "b_label": "Zen Count – flacher Einsatz",
+    "diff": 0.013737855314694807,
+    "ci95": 0.0011133860535187524,
+    "z": 24.183616966383163,
+    "shoes": 230000,
+    "corr": 0.7090252012120163
+   },
+   {
+    "a": "wong_halves",
+    "b": "wong_halves:flat",
+    "a_label": "Wong Halves",
+    "b_label": "Wong Halves – flacher Einsatz",
+    "diff": 0.013788117695889555,
+    "ci95": 0.0011380808830420506,
+    "z": 23.745425052278968,
+    "shoes": 230000,
+    "corr": 0.7064730790963654
+   }
+  ],
+  "pairwise": [
+   {
+    "a": "hi_lo",
+    "b": "ko",
+    "a_label": "Hi-Lo",
+    "b_label": "KO (Knock-Out)",
+    "diff": -0.00018627617080138603,
+    "ci95": 0.0007886242016158276,
+    "z": -0.4629512866591189,
+    "shoes": 230000,
+    "corr": 0.8610799105775541
+   },
+   {
+    "a": "hi_lo",
+    "b": "hi_opt_2",
+    "a_label": "Hi-Lo",
+    "b_label": "Hi-Opt II",
+    "diff": -0.0023305805366449477,
+    "ci95": 0.000859397252313892,
+    "z": -5.315183331836375,
+    "shoes": 230000,
+    "corr": 0.8529188637655084
+   },
+   {
+    "a": "hi_lo",
+    "b": "omega_2",
+    "a_label": "Hi-Lo",
+    "b_label": "Omega II",
+    "diff": -0.002658036686018878,
+    "ci95": 0.000862184907280568,
+    "z": -6.0423885541074585,
+    "shoes": 230000,
+    "corr": 0.8503995807918477
+   },
+   {
+    "a": "hi_lo",
+    "b": "zen",
+    "a_label": "Hi-Lo",
+    "b_label": "Zen Count",
+    "diff": -0.0009764701374153292,
+    "ci95": 0.0007206205133502301,
+    "z": -2.655831024725418,
+    "shoes": 230000,
+    "corr": 0.8824786716210379
+   },
+   {
+    "a": "hi_lo",
+    "b": "wong_halves",
+    "a_label": "Hi-Lo",
+    "b_label": "Wong Halves",
+    "diff": -0.0008958350891932632,
+    "ci95": 0.0007136274639958606,
+    "z": -2.46039371148105,
+    "shoes": 230000,
+    "corr": 0.8869968398487853
+   },
+   {
+    "a": "ko",
+    "b": "hi_opt_2",
+    "a_label": "KO (Knock-Out)",
+    "b_label": "Hi-Opt II",
+    "diff": -0.0021443043658435617,
+    "ci95": 0.0008674093833094472,
+    "z": -4.845185494836735,
+    "shoes": 230000,
+    "corr": 0.8516535099888297
+   },
+   {
+    "a": "ko",
+    "b": "omega_2",
+    "a_label": "KO (Knock-Out)",
+    "b_label": "Omega II",
+    "diff": -0.002471760515217492,
+    "ci95": 0.000884914054423707,
+    "z": -5.474612593426056,
+    "shoes": 230000,
+    "corr": 0.8440818384423292
+   },
+   {
+    "a": "ko",
+    "b": "zen",
+    "a_label": "KO (Knock-Out)",
+    "b_label": "Zen Count",
+    "diff": -0.0007901939666139432,
+    "ci95": 0.0007756524216861281,
+    "z": -1.9967084280015839,
+    "shoes": 230000,
+    "corr": 0.8673219251737919
+   },
+   {
+    "a": "ko",
+    "b": "wong_halves",
+    "a_label": "KO (Knock-Out)",
+    "b_label": "Wong Halves",
+    "diff": -0.0007095589183918772,
+    "ci95": 0.0007989115865780391,
+    "z": -1.740755747308429,
+    "shoes": 230000,
+    "corr": 0.8614711202284664
+   },
+   {
+    "a": "hi_opt_2",
+    "b": "omega_2",
+    "a_label": "Hi-Opt II",
+    "b_label": "Omega II",
+    "diff": -0.00032745614937393017,
+    "ci95": 0.0006994916720093263,
+    "z": -0.9175266697713715,
+    "shoes": 230000,
+    "corr": 0.9084863792398509
+   },
+   {
+    "a": "hi_opt_2",
+    "b": "zen",
+    "a_label": "Hi-Opt II",
+    "b_label": "Zen Count",
+    "diff": 0.0013541103992296185,
+    "ci95": 0.0006990985904584885,
+    "z": 3.7963281155739526,
+    "shoes": 230000,
+    "corr": 0.9045945878806599
+   },
+   {
+    "a": "hi_opt_2",
+    "b": "wong_halves",
+    "a_label": "Hi-Opt II",
+    "b_label": "Wong Halves",
+    "diff": 0.0014347454474516845,
+    "ci95": 0.0008245861371286137,
+    "z": 3.4102555203769915,
+    "shoes": 230000,
+    "corr": 0.8665301710446169
+   },
+   {
+    "a": "omega_2",
+    "b": "zen",
+    "a_label": "Omega II",
+    "b_label": "Zen Count",
+    "diff": 0.0016815665486035487,
+    "ci95": 0.000682963173332899,
+    "z": 4.8257505346642136,
+    "shoes": 230000,
+    "corr": 0.908047872605297
+   },
+   {
+    "a": "omega_2",
+    "b": "wong_halves",
+    "a_label": "Omega II",
+    "b_label": "Wong Halves",
+    "diff": 0.0017622015968256147,
+    "ci95": 0.0007344800243655468,
+    "z": 4.702444690043409,
+    "shoes": 230000,
+    "corr": 0.8936166828049917
+   },
+   {
+    "a": "zen",
+    "b": "wong_halves",
+    "a_label": "Zen Count",
+    "b_label": "Wong Halves",
+    "diff": 8.0635048222066e-05,
+    "ci95": 0.0006943848619738364,
+    "z": 0.2275997077532318,
+    "shoes": 230000,
+    "corr": 0.894261340786933
+   }
+  ],
+  "exact_vs": [
+   {
+    "a": "exact",
+    "b": "basic",
+    "a_label": "Exakt",
+    "b_label": "Basic Strategy",
+    "diff": 0.027326622439253566,
+    "ci95": 0.00546565942391017,
+    "z": 9.799219466223631,
+    "shoes": 23000,
+    "corr": 0.4738943590912882
+   },
+   {
+    "a": "exact",
+    "b": "hi_lo",
+    "a_label": "Exakt",
+    "b_label": "Hi-Lo",
+    "diff": 0.010813183647396916,
+    "ci95": 0.004736052339016091,
+    "z": 4.474919016348869,
+    "shoes": 23000,
+    "corr": 0.6477940805600368
+   },
+   {
+    "a": "exact",
+    "b": "ko",
+    "a_label": "Exakt",
+    "b_label": "KO (Knock-Out)",
+    "diff": 0.009250591890912083,
+    "ci95": 0.0047279135282815654,
+    "z": 3.8348474388171696,
+    "shoes": 23000,
+    "corr": 0.6528823985124319
+   },
+   {
+    "a": "exact",
+    "b": "hi_opt_2",
+    "a_label": "Exakt",
+    "b_label": "Hi-Opt II",
+    "diff": 0.00800941210844602,
+    "ci95": 0.004588282941978479,
+    "z": 3.421358183928651,
+    "shoes": 23000,
+    "corr": 0.6841606144223779
+   },
+   {
+    "a": "exact",
+    "b": "omega_2",
+    "a_label": "Exakt",
+    "b_label": "Omega II",
+    "diff": 0.007893274680591512,
+    "ci95": 0.0045720469238347775,
+    "z": 3.383721662046076,
+    "shoes": 23000,
+    "corr": 0.6872859531612668
+   },
+   {
+    "a": "exact",
+    "b": "zen",
+    "a_label": "Exakt",
+    "b_label": "Zen Count",
+    "diff": 0.009811487370279473,
+    "ci95": 0.004646853623432416,
+    "z": 4.138318869187449,
+    "shoes": 23000,
+    "corr": 0.6642839447710861
+   },
+   {
+    "a": "exact",
+    "b": "wong_halves",
+    "a_label": "Exakt",
+    "b_label": "Wong Halves",
+    "diff": 0.01003610839032511,
+    "ci95": 0.00461277936256496,
+    "z": 4.264329507014905,
+    "shoes": 23000,
+    "corr": 0.6711294456938968
+   },
+   {
+    "a": "exact",
+    "b": "exact:flat",
+    "a_label": "Exakt",
+    "b_label": "Exakt – flacher Einsatz",
+    "diff": 0.02394639559149537,
+    "ci95": 0.004886121958213609,
+    "z": 9.605587762743639,
+    "shoes": 23000,
+    "corr": 0.6919200204497458
+   }
+  ],
+  "decomposition": [
+   {
+    "a": "hi_lo:flat",
+    "b": "basic",
+    "a_label": "Hi-Lo – flacher Einsatz",
+    "b_label": "Basic Strategy",
+    "diff": 0.0011856322887319683,
+    "ci95": 0.0004172385541352479,
+    "z": 5.5694675866387096,
+    "shoes": 230000,
+    "corr": 0.8246059519737164
+   },
+   {
+    "a": "hi_lo:spread_only",
+    "b": "basic",
+    "a_label": "Hi-Lo – nur Einsatzstaffelung",
+    "b_label": "Basic Strategy",
+    "diff": 0.010436382356193652,
+    "ci95": 0.0010613761089783094,
+    "z": 19.27208793880319,
+    "shoes": 230000,
+    "corr": 0.7183058930699154
+   },
+   {
+    "a": "hi_lo",
+    "b": "basic",
+    "a_label": "Hi-Lo",
+    "b_label": "Basic Strategy",
+    "diff": 0.014160019581989786,
+    "ci95": 0.0012364127767125579,
+    "z": 22.44649128730825,
+    "shoes": 230000,
+    "corr": 0.5500318977040317
+   },
+   {
+    "a": "hi_lo",
+    "b": "hi_lo:spread_only",
+    "a_label": "Hi-Lo",
+    "b_label": "Hi-Lo – nur Einsatzstaffelung",
+    "diff": 0.0037236372257961337,
+    "ci95": 0.001152506342478401,
+    "z": 6.332455312936438,
+    "shoes": 230000,
+    "corr": 0.6889385700091858
+   },
+   {
+    "a": "hi_lo",
+    "b": "hi_lo:flat",
+    "a_label": "Hi-Lo",
+    "b_label": "Hi-Lo – flacher Einsatz",
+    "diff": 0.012974387293257818,
+    "ci95": 0.0010891525371723556,
+    "z": 23.347815066255173,
+    "shoes": 230000,
+    "corr": 0.7140782225010107
+   }
+  ],
+  "vs_hilo": [
+   {
+    "a": "ko",
+    "b": "hi_lo",
+    "a_label": "KO (Knock-Out)",
+    "b_label": "Hi-Lo",
+    "diff": 0.00018627617080138603,
+    "ci95": 0.0007886242016158276,
+    "z": 0.4629512866591189,
+    "shoes": 230000,
+    "corr": 0.8610799105775541
+   },
+   {
+    "a": "hi_opt_2",
+    "b": "hi_lo",
+    "a_label": "Hi-Opt II",
+    "b_label": "Hi-Lo",
+    "diff": 0.0023305805366449477,
+    "ci95": 0.000859397252313892,
+    "z": 5.315183331836375,
+    "shoes": 230000,
+    "corr": 0.8529188637655084
+   },
+   {
+    "a": "omega_2",
+    "b": "hi_lo",
+    "a_label": "Omega II",
+    "b_label": "Hi-Lo",
+    "diff": 0.002658036686018878,
+    "ci95": 0.000862184907280568,
+    "z": 6.0423885541074585,
+    "shoes": 230000,
+    "corr": 0.8503995807918477
+   },
+   {
+    "a": "zen",
+    "b": "hi_lo",
+    "a_label": "Zen Count",
+    "b_label": "Hi-Lo",
+    "diff": 0.0009764701374153292,
+    "ci95": 0.0007206205133502301,
+    "z": 2.655831024725418,
+    "shoes": 230000,
+    "corr": 0.8824786716210379
+   },
+   {
+    "a": "wong_halves",
+    "b": "hi_lo",
+    "a_label": "Wong Halves",
+    "b_label": "Hi-Lo",
+    "diff": 0.0008958350891932632,
+    "ci95": 0.0007136274639958606,
+    "z": 2.46039371148105,
+    "shoes": 230000,
+    "corr": 0.8869968398487853
+   },
+   {
+    "a": "exact",
+    "b": "hi_lo",
+    "a_label": "Exakt",
+    "b_label": "Hi-Lo",
+    "diff": 0.010813183647396916,
+    "ci95": 0.004736052339016091,
+    "z": 4.474919016348869,
+    "shoes": 23000,
+    "corr": 0.6477940805600368
+   }
+  ],
+  "z_bonferroni": 2.9351994688666982,
+  "shares": {
+   "hi_lo": 0.4857023392688412,
+   "ko": 0.49209179172576795,
+   "hi_opt_2": 0.5656435012106397,
+   "omega_2": 0.5768755632030663,
+   "zen": 0.519196207495692,
+   "wong_halves": 0.516430347510701
   }
- ],
+ },
  "eor": {
   "2": 0.000693,
   "3": 0.000832,
@@ -358,19 +1343,5 @@
   "wong_halves": {
    "bc": 0.9926
   }
- },
- "jev_note": "nicht simuliert – kein API-Key vorhanden (Jev: kein API-Key → lokale Strategie (offline)). Mit Key: `python -m blackjack_assistant simulate` erneut ausführen; die Variante „Jev + Hi-Lo“ erscheint dann automatisch.",
- "findings": [
-  "Basic Strategy ohne Zählen verliert langfristig: theoretisch -0.34 % pro Einheit (exakt berechnet), im Langlauf -0.17 % ± 0.32 % pro Runde.",
-  "Mit Hi-Lo, Abweichungen und Spread 1–8 dreht der Vorteil ins Plus: +1.37 % pro Runde (± 0.66 %), +0.92 % pro eingesetzter Einheit.",
-  "Die exakte Strategie (theoretisches Maximum) erreicht +2.63 % pro Runde (+1.39 % pro eingesetzter Einheit). Die Zählsysteme holen davon 51–62 % des möglichen Zusatzgewinns; am meisten Hi-Opt II (+1.56 %). Die Unterschiede zwischen den Systemen liegen innerhalb des Zufallsspielraums.",
-  "In den geforderten 10'000 Händen ist das Ergebnis vom Zufall geprägt: Hi-Lo +262 Einheiten, Basic -211, Exakt +266 (95-%-Spielraum pro Runde ca. ± 4.8 %).",
-  "Zählen erhöht die Schwankungen deutlich: Streuung pro Runde 2.45 Einheiten statt 1.14 (Basic), weil bei hohem Count mehr gesetzt wird.",
-  "Wenn nach jeder Runde gemischt wird, bringt Zählen nichts: Alle Zählsysteme spielen dann Basic Strategy mit 1 Einheit; auch die exakte Strategie kann nur noch die Karten der laufenden Runde nutzen."
- ],
- "shoe_vs_every": [
-  "Tiefer Schuh (75 %): im Schnitt 43.5 Runden pro Schuh, der Count kann sich aufbauen, Einsatz und Spielzüge passen sich an.",
-  "Mischen nach jeder Runde: 10000 Mischvorgänge in 10000 Runden. Hi-Lo setzt dann immer 1 Einheit (Ø Einsatz 1.00) und hat denselben Nachteil wie Basic Strategy.",
-  "Viele Online-Casinos (auch im Demo-Modus) mischen nach jeder Runde oder nutzen einen Zufallsgenerator pro Karte – genau dieser Fall. Das Overlay warnt dann mit „Zählen hier wirkungslos“."
- ]
+ }
 }

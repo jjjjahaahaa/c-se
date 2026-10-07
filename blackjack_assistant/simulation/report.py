@@ -186,7 +186,7 @@ def plot_bankroll(results: dict, path: Path) -> None:
 
 
 def plot_ci_rows(rows: list[tuple[str, dict[str, tuple[float, float]]]], series: dict[str, str],
-                 path: Path, title: str, xlabel: str) -> None:
+                 path: Path, title: str, xlabel: str, legend_loc: str = "lower right") -> None:
     """Punkt + 95-%-Intervall pro Zeile. rows: (Beschriftung, {Serie: (Wert, ±)}),
     series: Serie → Farbe (feste Reihenfolge). Werte in Prozent."""
     fig, ax = _figure(10, 0.45 * len(rows) + 1.7)
@@ -208,7 +208,7 @@ def plot_ci_rows(rows: list[tuple[str, dict[str, tuple[float, float]]]], series:
     ax.set_yticklabels([r[0] for r in rows], color=TEXT, fontsize=9)
     ax.set_xlabel(xlabel, color=MUTED, fontsize=9)
     if len(names) > 1:
-        ax.legend(frameon=False, fontsize=9, loc="lower right", labelcolor=TEXT)
+        ax.legend(frameon=False, fontsize=9, loc=legend_loc, labelcolor=TEXT)
     fig.tight_layout()
     fig.savefig(path, dpi=130)
 
@@ -390,6 +390,21 @@ def share_intervals(lr: dict) -> dict[str, float]:
     return out
 
 
+def rank_tiers(lr: dict) -> list[list[str]]:
+    """Rangstufen: Systeme nach Gewinn sortiert; ein System kommt in die aktuelle Stufe, wenn es
+    sich von keinem Mitglied nach Bonferroni gesichert unterscheidet, sonst beginnt eine neue."""
+    v = lr["variants"]
+    zb = lr["z_bonferroni"]
+    sig = {frozenset((c["a"], c["b"])) for c in lr["pairwise"] if abs(c["z"]) >= zb}
+    tiers: list[list[str]] = []
+    for k in sorted((k for k in SYSTEMS if k in v), key=lambda k: -v[k]["ev_per_round"]):
+        if tiers and not any(frozenset((k, m)) in sig for m in tiers[-1]):
+            tiers[-1].append(k)
+        else:
+            tiers.append([k])
+    return tiers
+
+
 def write_report(s: dict, path: Path) -> None:
     lr = s.get("longrun")
     lines = [
@@ -520,11 +535,14 @@ def _findings(s: dict) -> list[str]:
             + ("(gesichert)." if abs(d["dev"]["z"]) >= Z95 else "(nicht gesichert)."))
     ranked = sorted((k for k in SYSTEMS if k in v), key=lambda k: -v[k]["ev_per_round"])
     sig = [c for c in lr["pairwise"] if abs(c["z"]) >= lr["z_bonferroni"]]
+    tiers = rank_tiers(lr)
     out.append(
         "Rangliste im Langlauf: " + ", ".join(
             f"{load_systems()[k].name} {pct(v[k]['ev_per_round'])}" for k in ranked)
         + f". Von {len(lr['pairwise'])} Paarvergleichen sind {len(sig)} nach Bonferroni-Korrektur "
-        "gesichert (Details: Abschnitt „Statistische Signifikanz“).")
+        "gesichert. Gesicherte **Rangstufen**: "
+        + " > ".join("{" + ", ".join(load_systems()[k].name for k in t) + "}" for t in tiers)
+        + " (innerhalb einer Stufe kein gesicherter Unterschied).")
     if "exact" in v:
         out.append(
             f"Die exakte Strategie (theoretisches Maximum, {fmt_n(v['exact']['rounds'])} Runden) "
@@ -651,7 +669,7 @@ def _section_origin(s: dict) -> list[str]:
                        f"{pct(c['diff'], 3)} | {pm(c['ci95'], 3)} | {verdict(c)} |")
     out += ["", "Flacher Einsatz für alle Systeme (gleiche Spielzüge, immer 1 Einheit):", "",
             "| System | mit Spread 1–8 | flacher Einsatz | Gewinn durch die Staffelung | "
-            "95-%-Intervall | flach: besser als Basic? |",
+            "95-%-Intervall | flach minus Basic |",
             "|---|---:|---:|---:|---:|---|"]
     for c in lr["spread_vs_flat"]:
         k = c["a"]
@@ -753,6 +771,19 @@ def _section_significance(s: dict) -> list[str]:
     if weak:
         out.append("- Nur auf 95-%-Niveau, aber nicht nach Bonferroni gesichert: "
                    + "; ".join(f"{c['a_label']} vs. {c['b_label']}" for c in weak) + ".")
+    tiers = rank_tiers(lr)
+    out.append("- **Gesicherte Rangstufen** (nach Bonferroni): "
+               + " > ".join("{" + ", ".join(load_systems()[k].name for k in t) + "}" for t in tiers)
+               + ". Innerhalb einer Stufe ist kein Unterschied gesichert.")
+    bc = s.get("betting_correlation", {})
+    if bc:
+        best_bc = max(bc, key=lambda k: bc[k].get("bc_ace_adjusted", bc[k]["bc"]))
+        if tiers and best_bc not in tiers[0]:
+            out.append(f"- Die Rangliste weicht von der Betting Correlation ab (dort liegt "
+                       f"{load_systems()[best_bc].name} vorn). Mögliche Gründe (Deutung, nicht gemessen): "
+                       "Die Betting Correlation bewertet nur die Kartenwerte für den Einsatz; im Langlauf "
+                       "zählen auch die Spielzüge (siehe Spalte „flach minus Basic“ in Abschnitt 3) und "
+                       "die umgerechneten Einsatzschwellen und Indizes – siehe nächster Punkt.")
     rest = len(lr["pairwise"]) - len(sig) - len(weak)
     if rest:
         out.append(f"- Bei den übrigen {rest} Paaren ist kein Unterschied nachweisbar – die Systeme "
@@ -808,6 +839,41 @@ def _section_shoe_vs_every(s: dict) -> list[str]:
     ]
 
 
+def plot_longrun_charts(longrun: dict, img: Path) -> None:
+    """Grafiken des Langlaufs (brauchen nur die Kennzahlen aus results.json)."""
+    v = longrun["variants"]
+    rows = []
+    for k in ["basic", *SYSTEMS, "exact"]:
+        if k not in v:
+            continue
+        label = {"basic": "Basic Strategy", "exact": "Exakt"}.get(k) or load_systems()[k].name
+        entry = {}
+        if k != "basic":
+            entry["Spread 1–8"] = (v[k]["ev_per_round"], v[k]["ci95"])
+        flat_key = "basic" if k == "basic" else f"{k}:flat"
+        if flat_key in v:
+            entry["flacher Einsatz"] = (v[flat_key]["ev_per_round"], v[flat_key]["ci95"])
+        rows.append((label, entry))
+    plot_ci_rows(rows, {"Spread 1–8": BLUE, "flacher Einsatz": ORANGE}, img / "langlauf.png",
+                 f"Langlauf: Gewinn pro Runde ({fmt_n(v['hi_lo']['rounds'])} Runden pro System)",
+                 CI_XLABEL, legend_loc="upper right")
+    deco = [("Basic Strategy", "basic"), ("nur Abweichungen (flach)", "hi_lo:flat"),
+            ("nur Einsatzstaffelung", "hi_lo:spread_only"), ("Abweichungen + Staffelung", "hi_lo")]
+    plot_ci_rows([(f"Hi-Lo: {t}" if k != "basic" else t,
+                   {"Gewinn": (v[k]["ev_per_round"], v[k]["ci95"])}) for t, k in deco if k in v],
+                 {"Gewinn": BLUE}, img / "vorteil_herkunft.png",
+                 "Woher kommt der Vorteil? Hi-Lo zerlegt (gleiche Schuhe)", CI_XLABEL)
+    diffs = [(c["a_label"], {"Unterschied": (c["diff"], c["ci95"])}) for c in longrun["vs_hilo"]]
+    plot_ci_rows(diffs, {"Unterschied": BLUE}, img / "unterschied_zu_hilo.png",
+                 "Unterschied zu Hi-Lo (gepaart, gleiche Schuhe) – Intervall ohne 0 = gesichert (95 %)",
+                 "Unterschied im Gewinn pro Runde in % einer Einheit (± 95-%-Intervall)")
+    if longrun.get("shares"):
+        plot_hbar([load_systems()[k].name for k in longrun["shares"]],
+                  [x * 100 for x in longrun["shares"].values()], img / "anteil_maximum.png",
+                  "Anteil am maximal möglichen Zusatzgewinn (Exakt = 100 %)",
+                  "% des Zusatzgewinns der exakten Strategie gegenüber Basic Strategy", "{:.0f} %")
+
+
 # ----------------------------------------------------------------------
 # Hauptprogramm
 # ----------------------------------------------------------------------
@@ -830,6 +896,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.report_only:
         summary = json.loads((args.out / "results.json").read_text(encoding="utf-8"))
+        if summary.get("longrun"):
+            plot_longrun_charts(summary["longrun"], args.out / "img")
         write_report(summary, args.out / "results.md")
         print(f"Bericht: {args.out / 'results.md'}")
         return 0
@@ -909,37 +977,7 @@ def main(argv: list[str] | None = None) -> int:
               "Betting Correlation der Zählsysteme (mit Ass-Korrektur, falls vorhanden)",
               "Korrelation mit den exakten Effects of Removal (1 = perfekt)", "{:.3f}")
     if longrun:
-        v = longrun["variants"]
-        rows = []
-        for k in ["basic", *SYSTEMS, "exact"]:
-            if k not in v:
-                continue
-            label = {"basic": "Basic Strategy", "exact": "Exakt"}.get(k) or load_systems()[k].name
-            entry = {}
-            if k != "basic":
-                entry["Spread 1–8"] = (v[k]["ev_per_round"], v[k]["ci95"])
-            flat_key = "basic" if k == "basic" else f"{k}:flat"
-            if flat_key in v:
-                entry["flacher Einsatz"] = (v[flat_key]["ev_per_round"], v[flat_key]["ci95"])
-            rows.append((label, entry))
-        plot_ci_rows(rows, {"Spread 1–8": BLUE, "flacher Einsatz": ORANGE}, img / "langlauf.png",
-                     f"Langlauf: Gewinn pro Runde ({fmt_n(v['hi_lo']['rounds'])} Runden pro System)",
-                     CI_XLABEL)
-        deco = [("Basic Strategy", "basic"), ("nur Abweichungen (flach)", "hi_lo:flat"),
-                ("nur Einsatzstaffelung", "hi_lo:spread_only"), ("Abweichungen + Staffelung", "hi_lo")]
-        plot_ci_rows([(f"Hi-Lo: {t}" if k != "basic" else t,
-                       {"Gewinn": (v[k]["ev_per_round"], v[k]["ci95"])}) for t, k in deco if k in v],
-                     {"Gewinn": BLUE}, img / "vorteil_herkunft.png",
-                     "Woher kommt der Vorteil? Hi-Lo zerlegt (gleiche Schuhe)", CI_XLABEL)
-        diffs = [(c["a_label"], {"Unterschied": (c["diff"], c["ci95"])}) for c in longrun["vs_hilo"]]
-        plot_ci_rows(diffs, {"Unterschied": BLUE}, img / "unterschied_zu_hilo.png",
-                     "Unterschied zu Hi-Lo (gepaart, gleiche Schuhe) – Intervall ohne 0 = gesichert",
-                     "Unterschied im Gewinn pro Runde in % einer Einheit (± 95-%-Intervall)")
-        if longrun.get("shares"):
-            plot_hbar([load_systems()[k].name for k in longrun["shares"]],
-                      [x * 100 for x in longrun["shares"].values()], img / "anteil_maximum.png",
-                      "Anteil am maximal möglichen Zusatzgewinn (Exakt = 100 %)",
-                      "% des Zusatzgewinns der exakten Strategie gegenüber Basic Strategy", "{:.0f} %")
+        plot_longrun_charts(longrun, img)
 
     runs_10k = []
     for (k, m), res in results.items():
