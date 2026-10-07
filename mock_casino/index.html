@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mock-Casino Blackjack</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Mock-Casino Blackjack</h1>
+    <div class="stat">Guthaben <strong id="bankroll">–</strong></div>
+    <div class="stat">Runde <strong id="round">0</strong></div>
+    <div class="stat">Schuh <strong id="shoe-number">1</strong></div>
+    <div class="rules" id="rules-text"></div>
+    <div class="debug-badge" id="debug-badge" hidden>DEBUG · Ground Truth wird protokolliert</div>
+  </header>
+
+  <main class="layout">
+    <!-- Spieltisch -->
+    <section class="table" id="table">
+      <div class="area dealer-area">
+        <div class="area-label">Dealer <span class="total" id="dealer-total"></span></div>
+        <div class="cards" id="dealer-cards"></div>
+      </div>
+
+      <div class="message" id="message">Einsatz wählen und austeilen</div>
+
+      <div class="area player-area">
+        <div class="hands" id="player-hands"></div>
+      </div>
+
+      <div class="controls">
+        <div class="bet-row" id="bet-row">
+          <span>Einsatz:</span>
+          <button class="chip" data-chip="5">5</button>
+          <button class="chip" data-chip="10">10</button>
+          <button class="chip" data-chip="25">25</button>
+          <button class="chip" data-chip="100">100</button>
+          <strong class="bet-value" id="bet-value">10</strong>
+          <button id="btn-clear-bet" class="small">Löschen</button>
+          <button id="btn-deal" class="primary" title="Enter">Austeilen</button>
+        </div>
+        <div class="action-row">
+          <button id="btn-hit" title="H">Ziehen</button>
+          <button id="btn-stand" title="S">Stehen</button>
+          <button id="btn-double" title="D">Verdoppeln</button>
+          <button id="btn-split" title="P">Teilen</button>
+          <button id="btn-surrender" title="R">Aufgeben</button>
+        </div>
+        <div class="action-row" id="insurance-row" hidden>
+          <span>Dealer zeigt ein Ass – Versicherung?</span>
+          <button id="btn-insure-yes" title="Y">Versichern</button>
+          <button id="btn-insure-no" title="N">Ablehnen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Verlaufs-Panel: alle seit dem letzten Mischen aufgedeckten Karten -->
+    <aside class="history-panel">
+      <h2>Verlauf seit dem Mischen <span class="count" id="history-count">0</span></h2>
+      <div class="shoe-indicator">
+        <div class="shoe-bar" id="shoe-bar">
+          <div class="shoe-fill" id="shoe-fill"></div>
+          <div class="cut-marker" id="cut-marker" title="Schnittkarte"></div>
+        </div>
+        <div class="shoe-text" id="shoe-text"></div>
+        <div class="shuffle-warning" id="shuffle-warning" hidden>
+          Schnittkarte erreicht – nach dieser Runde wird neu gemischt
+        </div>
+      </div>
+      <div class="history-grid" id="history"></div>
+    </aside>
+  </main>
+
+  <details class="settings">
+    <summary>Einstellungen</summary>
+    <label><input type="checkbox" id="opt-shuffle-every-round"> Nach jeder Runde neu mischen</label>
+    <label>Animationstempo
+      <select id="opt-speed">
+        <option value="0">aus</option>
+        <option value="0.5">schnell</option>
+        <option value="1" selected>normal</option>
+        <option value="2">langsam</option>
+      </select>
+    </label>
+    <label>Tisch räumen nach
+      <select id="opt-clear">
+        <option value="1000">1 s</option>
+        <option value="2500" selected>2.5 s</option>
+        <option value="5000">5 s</option>
+      </select>
+    </label>
+    <button id="btn-shuffle-now" class="small">Jetzt neu mischen</button>
+    <button id="btn-reset-bankroll" class="small">Guthaben auf 1000 setzen</button>
+    <p class="hint">Tasten: Enter = Austeilen, H = Ziehen, S = Stehen, D = Verdoppeln,
+      P = Teilen, R = Aufgeben, Y/N = Versicherung</p>
+  </details>
+
+  <!-- Einblendung beim Mischen -->
+  <div class="shuffle-banner" id="shuffle-banner" hidden>Neu gemischt</div>
+
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>

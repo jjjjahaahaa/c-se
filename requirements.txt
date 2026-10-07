@@ -1,0 +1,8 @@
+# Abhängigkeiten werden pro Phase ergänzt.
+
+# --- Tests ------------------------------------------------------------
+pytest>=8.0
+# Browser-Tests für das Mock-Casino (Headless, kein Bildschirm nötig).
+# Nach der Installation einmalig:  python -m playwright install chromium
+# Ohne Playwright werden diese Tests automatisch übersprungen.
+playwright>=1.45

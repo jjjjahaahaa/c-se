@@ -1,0 +1,12 @@
+[project]
+name = "blackjack-assistant"
+version = "0.1.0"
+description = "Blackjack-Assistent mit Kartenerkennung, Zählsystemen und Strategie (Schulprojekt)"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "browser: Tests, die einen Headless-Browser (Playwright) brauchen",
+]

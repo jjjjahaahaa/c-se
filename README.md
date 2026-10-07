@@ -103,9 +103,10 @@ c-se/
 │   │   ├── shoe.js            Schuh, Mischen, Penetration
 │   │   ├── rules.js           Handwerte, Dealer-Logik, Auszahlungen
 │   │   ├── game.js            Spielablauf (Deal, Hit, Stand, Double, Split, Surrender)
-│   │   ├── cards.js           SVG-Kartenerzeugung
-│   │   └── ui.js              Tisch, Verlaufs-Panel, Mischanzeige, Debug-Schalter
-│   └── assets/cards/          Karten-SVGs
+│   │   ├── cards.js           Zuordnung Karte → SVG, Verlaufs-Kacheln
+│   │   ├── logger.js          Ereignisse an den Server senden (Ground Truth)
+│   │   └── ui.js              Tisch, Verlaufs-Panel, Mischanzeige, Tastatur
+│   └── assets/cards/          Karten-SVGs (erzeugt von tools/generate_card_svgs.py)
 │
 ├── blackjack_assistant/       Python-Paket
 │   ├── __main__.py            Startpunkt: python -m blackjack_assistant
@@ -158,22 +159,66 @@ c-se/
 
 ---
 
-## Installation (Entwurf, wird pro Phase ergänzt)
+## Installation
 
 ```bash
 python -m venv .venv
 # Windows:  .venv\Scripts\activate
 # Linux/macOS:  source .venv/bin/activate
 pip install -r requirements.txt
+python -m playwright install chromium   # nur für die Browser-Tests
 pytest
 ```
 
-Mock-Casino starten (ab Phase 1):
+Ohne Playwright werden die Browser-Tests übersprungen, alle anderen Tests laufen trotzdem.
+
+## Mock-Casino (Phase 1)
 
 ```bash
 python mock_casino/server.py            # http://localhost:8000
 python mock_casino/server.py --debug    # zusätzlich Ground-Truth-Log in logs/
 ```
+
+| Option | Bedeutung |
+|---|---|
+| `--debug` | Jede aufgedeckte Karte wird nach `logs/ground_truth_<Datum>_<Zeit>.jsonl` geschrieben |
+| `--log-file PFAD` | Eigener Pfad für das Ground-Truth-Log |
+| `--seed N` | Reproduzierbares Mischen (gleicher Seed = gleiche Kartenfolge) |
+| `--decks N`, `--penetration X` | Standard: 6 Decks, 0.75 |
+| `--shuffle-every-round` | Nach jeder Runde neu mischen (wie viele Online-Spiele) |
+| `--port N` | Standard: 8000 |
+
+URL-Parameter überschreiben die Einstellungen im Browser, z. B.
+`http://localhost:8000/?seed=42&speed=0&clear=1000&every=1`
+(`speed`: Animationstempo 0 / 0.5 / 1 / 2, `clear`: ms bis der Tisch geräumt wird).
+
+**Regeln:** 6 Decks, Schnittkarte bei 75 %, Dealer steht auf Soft 17, Blackjack 3:2,
+Double auf zwei beliebige Karten (auch nach Split), Split bis 4 Hände (gesplittete Asse
+erhalten genau eine Karte), Late Surrender, Dealer-Peek bei Ass/Zehn, Versicherung 2:1.
+
+**Tastatur:** Enter = Austeilen, H = Ziehen, S = Stehen, D = Verdoppeln, P = Teilen,
+R = Aufgeben, Y/N = Versicherung.
+
+**Ablauf einer Runde (wichtig für die Erkennung):**
+1. Karten werden einzeln mit Animation ausgeteilt (Hole Card verdeckt).
+2. Nach der Abrechnung bleiben die Karten 2.5 s liegen, dann wird der Tisch geräumt
+   → leerer Tisch = Rundenende (Tisch-Modus).
+3. Ist die Schnittkarte erreicht, wird danach gemischt: Das Verlaufs-Panel wird leer
+   → leeres Panel = Neu-Mischen (Verlaufs-Modus).
+
+**Ground-Truth-Format** (eine JSON-Zeile pro Ereignis):
+
+```json
+{"server_time": "2026-10-07T14:25:01.123", "type": "card", "rank": "K", "suit": "H",
+ "target": "dealer", "hand": 0, "hole": true, "round": 12, "shoe": 2, "seq": 47}
+```
+
+Weitere Typen: `session_start`, `round_start`, `round_end` (mit Ergebnis), `shuffle`
+(mit Grund `cut_card` / `every_round` / `manual` und Anzahl Runden seit dem letzten Mischen).
+`seq` ist die Position der Karte im Verlaufs-Panel.
+
+Die Karten-SVGs werden mit `python tools/generate_card_svgs.py` erzeugt. Ränge sind
+Pfade statt Text, damit die Darstellung nicht von installierten Schriften abhängt.
 
 ## Konfiguration und Geheimnisse
 
