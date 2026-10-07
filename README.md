@@ -255,6 +255,39 @@ der Ground Truth. Optionen: `--hide-hole`, `--every` (mischen jede Runde), `--pa
 (Mindest-Konfidenz, Skalierung, Stabilitätszeit …), `rules`, `counting`, `betting`.
 Templates liegen in `profiles/<name>/templates/<Rang>_<n>.png`.
 
+## Zählen und Strategie (Phase 3)
+
+```bash
+python -m blackjack_assistant systems      # Zählsysteme mit ihren Kartenwerten
+```
+
+| Datei | Inhalt |
+|---|---|
+| `config/counting_systems.toml` | Kartenwerte aller Zählsysteme (Hi-Lo, KO, Hi-Opt II, Omega II, Zen, Wong Halves), Typ, KO-Schwellen, Ass-Nebenzähler |
+| `config/basic_strategy.toml` | Basic Strategy für 6 Decks, S17, DAS, Late Surrender (hart, soft, Paare) + H17-Anpassungen |
+| `config/deviations.toml` | Illustrious 18 und Fab 4 (Hi-Lo-Indizes), optional eigene Indizes pro System |
+
+Im Profil (`counting`, `betting`):
+
+```json
+"counting": {"system": "zen", "deck_rounding": 0.5},
+"betting":  {"unit": 10, "ramp": [[2, 2], [3, 4], [4, 6], [5, 8]]}
+```
+
+- **Running Count** = Summe der Kartenwerte, **Restdecks** = Decks − (gesehene + ungesehene
+  Karten) / 52, auf halbe Decks gerundet, **True Count** = Running Count / Restdecks.
+- **KO** (unausgeglichen) startet bei IRC = 4 − 4 × Decks und arbeitet mit festen Schwellen
+  auf dem Running Count (Key Count, Pivot, Versicherung ab +3).
+- **Hi-Opt II, Omega II**: Asse werden separat gezählt; für den Einsatz wird der Count um
+  2 Punkte pro überzähligem Ass korrigiert.
+- **Mischen** setzt den Count zurück. Option „mischt jede Runde“ (`rules.shuffle_every_round`):
+  Count nach jeder Runde auf 0, Hinweis „Zählen hier wirkungslos“.
+- **Mischstatistik**: `logs/shuffle_stats.jsonl` (Runden und Penetration pro Schuh).
+- **Strategie**: Basic Strategy aus der Tabelle, angepasst an die Profilregeln (H17, kein DAS,
+  kein Surrender, Verdoppeln/Teilen nicht möglich). Abweichungen nach True Count; für andere
+  Systeme werden die Hi-Lo-Indizes umgerechnet (Faktor = Regression der Kartenwerte auf Hi-Lo).
+- **Einsatz**: 1 Einheit bis TC +1, danach laut Staffelung.
+
 ## Konfiguration und Geheimnisse
 
 - Der Jev-API-Key wird **nur** aus der Umgebungsvariable `JEV_API_KEY` gelesen

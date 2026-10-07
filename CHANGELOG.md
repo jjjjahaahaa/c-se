@@ -132,3 +132,61 @@ werden (LOCAL_TESTS.md).
 - Die Orientierungsprüfung setzt voraus, dass Karten nebeneinander liegen (Rang oben links,
   Farbsymbol darunter). Bei Spielen mit senkrecht gestapelten Karten kann sie im Profil
   abgeschaltet werden (`orientation_check: false`).
+
+---
+
+## Phase 3 – Zählen und Strategie
+
+**Zählen (`counting`)**
+- Sechs Zählsysteme, Kartenwerte als Tabelle in `config/counting_systems.toml` (nicht im Code):
+  Hi-Lo, KO, Hi-Opt II, Omega II, Zen Count, Wong Halves. Beim Laden wird geprüft, ob ein als
+  ausgeglichen markiertes System pro Deck wirklich die Summe 0 hat.
+- `Counter`: Running Count, verbleibende Decks (gesehene + ungesehene Karten, Deckanzahl aus dem
+  Profil, auf halbe Decks gerundet), True Count. KO ohne True Count, mit Start-Count (IRC).
+  Ass-Nebenzähler für Hi-Opt II und Omega II.
+- Verarbeitet direkt die Ereignisse der Erkennung: neue Karte, Korrektur, ungesehen
+  (zählt nicht, verringert aber die Restdecks), Rundenende, Mischen.
+- Misch-Erkennung setzt den Count zurück. Option „mischt jede Runde“: Count nach jeder Runde
+  auf 0, Kennzeichen „Zählen wirkungslos“ (Einsatz immer 1 Einheit, nur Basic Strategy).
+- Mischstatistik: pro Schuh Anzahl Runden und Penetration in `logs/shuffle_stats.jsonl`.
+
+**Strategie (`strategy`)**
+- Basic Strategy als Tabelle (`config/basic_strategy.toml`: 6 Decks, S17, DAS, Late Surrender).
+  Regeln pro Profil: H17 (eigene Ausnahmeliste), ohne DAS, ohne Surrender, Verdoppeln/Teilen
+  nicht möglich (z. B. drei Karten) werden im Code umgesetzt.
+- Abweichungen: Illustrious 18 + Fab 4 (`config/deviations.toml`). Reihenfolge: zuerst
+  Surrender-Indizes, dann Spiel-Indizes; Versicherung separat.
+- Einsatz: 1 Einheit bis TC +1, danach Staffelung aus dem Profil.
+- Gemeinsame Schnittstelle `DecisionEngine` (für Phase 5).
+- Zusätzlich (parallel von einem Subagenten erstellt, für Phase 6 gebraucht): **exakte
+  Erwartungswert-Berechnung** aus der Restzusammensetzung (`simulation/exact.py`). Damit wird die
+  Basic-Strategy-Tabelle unabhängig geprüft: Von allen 550 Zwei-Karten-Situationen (voller
+  6-Deck-Schuh) stimmen 548 mit der exakten Berechnung überein. Die 2 Abweichungen sind bekannte
+  zusammensetzungsabhängige Ausnahmen mit winzigem Unterschied: 10,2 gegen 4 (Ziehen statt Stehen,
+  0,075 % des Einsatzes) und 8,7 gegen 10 (Ziehen statt Aufgeben, 0,024 %).
+
+**Gefundene und behobene Fehler**
+- A,A ohne Teilmöglichkeit wurde als „hart 12“ gespielt (gegen 4–6 stehen). Ergänzt: Zeile Soft 12.
+- 16 gegen 10 mit erlaubtem Surrender: Der I18-Index „ab TC 0 stehen“ hat das Aufgeben
+  überschrieben. Spiel-Indizes gelten jetzt nur, wenn nicht aufgegeben wird.
+
+**Tests**: Kartenwerte aller Systeme, ausgeglichen/unausgeglichen, ganzer Schuh ergibt 0 (bzw.
++4 bei KO), Running/True Count, Restdecks inkl. ungesehener Karten, Korrekturen, Mischen,
+„mischt jede Runde“, Statistik, Ass-Nebenzähler; Basic Strategy (40 Stichproben + Vergleich mit
+exakter Berechnung), H17/kein DAS/kein Surrender, alle Illustrious 18 und Fab 4, Umrechnung für
+Level-2-Systeme, KO-Schwellen, Einsatzstaffelung.
+
+**Offene Entscheidungen**
+- Die Illustrious-18-Indizes sind für Hi-Lo veröffentlicht. Für Hi-Opt II, Omega II, Zen und
+  Wong Halves werden sie mit einem Faktor umgerechnet (Regression der Kartenwerte gegenüber Hi-Lo:
+  1.5 / 1.6 / 1.7 / 1.0). Das ist eine Näherung; echte Indizes können in
+  `config/deviations.toml` unter `[overrides.<system>]` eingetragen werden.
+- KO: Die Hi-Lo-Indizes werden in feste Running-Count-Schwellen umgerechnet, bezogen auf eine
+  Referenztiefe von 37,5 % des Schuhs (Mitte des gespielten Teils bei 75 % Penetration).
+  Bei TC +4 ergibt das genau den Pivot (+4). Versicherung: fest ab RC +3.
+- Ass-Korrektur (Hi-Opt II, Omega II): 2 Punkte pro überzähligem Ass, nur für den Einsatz,
+  nicht für Spielentscheidungen.
+- True Count wird nicht abgerundet (z. B. TC 1.9 zählt nicht als 2). Restdecks auf halbe Decks
+  gerundet (einstellbar: `counting.deck_rounding`).
+- Seven-Card Charlie (Playtech-Profil) ist in der Basic-Strategy-Tabelle nicht berücksichtigt
+  (betrifft nur Hände mit 6 Karten); die exakte Berechnung kennt die Regel.

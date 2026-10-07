@@ -1,0 +1,73 @@
+# Basic Strategy für 6 Decks, Dealer steht auf Soft 17 (S17), Double after Split (DAS),
+# Late Surrender (LS), Dealer-Peek. Quelle: Standardtabellen (z. B. Wizard of Odds,
+# "4-8 Decks, S17, DAS, LS"). Geprüft gegen die exakte Berechnung in Phase 6.
+#
+# Spalten: Dealer-Upcard 2 3 4 5 6 7 8 9 10 A
+#
+# Codes:
+#   H  = Ziehen (hit)            S  = Stehen (stand)
+#   D  = Verdoppeln, sonst Ziehen
+#   Ds = Verdoppeln, sonst Stehen
+#   P  = Teilen (split)
+#   Ph = Teilen, wenn Double after Split erlaubt, sonst Ziehen
+#   Rh = Aufgeben, sonst Ziehen  Rs = Aufgeben, sonst Stehen  Rp = Aufgeben, sonst Teilen
+#
+# Abweichende Regeln (H17, kein DAS, kein Surrender, ...) werden im Code angepasst
+# (strategy/basic.py), damit hier nur eine Tabelle gepflegt werden muss.
+
+dealer = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "A"]
+
+[hard]
+"4"  = ["H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H"]
+"5"  = ["H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H"]
+"6"  = ["H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H"]
+"7"  = ["H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H"]
+"8"  = ["H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H"]
+"9"  = ["H",  "D",  "D",  "D",  "D",  "H",  "H",  "H",  "H",  "H"]
+"10" = ["D",  "D",  "D",  "D",  "D",  "D",  "D",  "D",  "H",  "H"]
+"11" = ["D",  "D",  "D",  "D",  "D",  "D",  "D",  "D",  "D",  "H"]
+"12" = ["H",  "H",  "S",  "S",  "S",  "H",  "H",  "H",  "H",  "H"]
+"13" = ["S",  "S",  "S",  "S",  "S",  "H",  "H",  "H",  "H",  "H"]
+"14" = ["S",  "S",  "S",  "S",  "S",  "H",  "H",  "H",  "H",  "H"]
+"15" = ["S",  "S",  "S",  "S",  "S",  "H",  "H",  "H",  "Rh", "H"]
+"16" = ["S",  "S",  "S",  "S",  "S",  "H",  "H",  "Rh", "Rh", "Rh"]
+"17" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+"18" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+"19" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+"20" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+"21" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+
+# Soft-Hände: Wert mit Ass als 11 (12 = A+A, wenn nicht geteilt werden kann; 13 = A+2 … 21)
+[soft]
+"12" = ["H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H",  "H"]
+"13" = ["H",  "H",  "H",  "D",  "D",  "H",  "H",  "H",  "H",  "H"]
+"14" = ["H",  "H",  "H",  "D",  "D",  "H",  "H",  "H",  "H",  "H"]
+"15" = ["H",  "H",  "D",  "D",  "D",  "H",  "H",  "H",  "H",  "H"]
+"16" = ["H",  "H",  "D",  "D",  "D",  "H",  "H",  "H",  "H",  "H"]
+"17" = ["H",  "D",  "D",  "D",  "D",  "H",  "H",  "H",  "H",  "H"]
+"18" = ["S",  "Ds", "Ds", "Ds", "Ds", "S",  "S",  "H",  "H",  "H"]
+"19" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+"20" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+"21" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+
+# Paare: Rang der Karte ("10" = jedes Paar mit Zehnerwert)
+[pairs]
+"2"  = ["Ph", "Ph", "P",  "P",  "P",  "P",  "H",  "H",  "H",  "H"]
+"3"  = ["Ph", "Ph", "P",  "P",  "P",  "P",  "H",  "H",  "H",  "H"]
+"4"  = ["H",  "H",  "H",  "Ph", "Ph", "H",  "H",  "H",  "H",  "H"]
+"5"  = ["D",  "D",  "D",  "D",  "D",  "D",  "D",  "D",  "H",  "H"]
+"6"  = ["Ph", "P",  "P",  "P",  "P",  "H",  "H",  "H",  "H",  "H"]
+"7"  = ["P",  "P",  "P",  "P",  "P",  "P",  "H",  "H",  "H",  "H"]
+"8"  = ["P",  "P",  "P",  "P",  "P",  "P",  "P",  "P",  "P",  "P"]
+"9"  = ["P",  "P",  "P",  "P",  "P",  "S",  "P",  "P",  "S",  "S"]
+"10" = ["S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S",  "S"]
+"A"  = ["P",  "P",  "P",  "P",  "P",  "P",  "P",  "P",  "P",  "P"]
+
+# Anpassungen, wenn der Dealer auf Soft 17 zieht (H17). Format: "Hand:Dealer" = Code
+[h17]
+"hard 11:A" = "D"
+"hard 15:A" = "Rh"
+"hard 17:A" = "Rs"
+"soft 18:2" = "Ds"
+"soft 19:6" = "Ds"
+"pair 8:A"  = "Rp"

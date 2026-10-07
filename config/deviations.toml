@@ -1,0 +1,224 @@
+# Abweichungen von der Basic Strategy abhängig vom Count (Index-Spiele).
+#
+# Mitgeliefert: Illustrious 18 und Fab 4 (Surrender) für Hi-Lo, mehrere Decks, S17
+# (Don Schlesinger, "Blackjack Attack"). Für andere ausgeglichene Systeme wird der Index mit
+# dem index_factor des Systems umgerechnet, für KO in eine feste Running-Count-Schwelle
+# (siehe counting/systems.py). Eigene Indizes pro System können unten unter
+# [overrides.<system>] eingetragen werden.
+#
+# Felder:
+#   hand      "hard 16", "soft 18", "pair 10" oder "insurance"
+#   dealer    Upcard des Dealers ("2".."10", "A")
+#   index     Hi-Lo True Count
+#   when      ">=" → Aktion, wenn TC >= index   "<" → Aktion, wenn TC < index
+#   action    stand / hit / double / split / surrender / insurance
+#   else      optional: Aktion, wenn die Bedingung NICHT erfüllt ist ("no_surrender" =
+#             nicht aufgeben, normal weiterspielen). Ohne Angabe: Basic Strategy.
+
+[[deviation]]
+name = "Versicherung"
+hand = "insurance"
+dealer = "A"
+index = 3
+when = ">="
+action = "insurance"
+group = "I18"
+
+[[deviation]]
+name = "16 gegen 10 stehen"
+hand = "hard 16"
+dealer = "10"
+index = 0
+when = ">="
+action = "stand"
+group = "I18"
+
+[[deviation]]
+name = "15 gegen 10 stehen"
+hand = "hard 15"
+dealer = "10"
+index = 4
+when = ">="
+action = "stand"
+group = "I18"
+
+[[deviation]]
+name = "10,10 gegen 5 teilen"
+hand = "pair 10"
+dealer = "5"
+index = 5
+when = ">="
+action = "split"
+group = "I18"
+
+[[deviation]]
+name = "10,10 gegen 6 teilen"
+hand = "pair 10"
+dealer = "6"
+index = 4
+when = ">="
+action = "split"
+group = "I18"
+
+[[deviation]]
+name = "10 gegen 10 verdoppeln"
+hand = "hard 10"
+dealer = "10"
+index = 4
+when = ">="
+action = "double"
+group = "I18"
+
+[[deviation]]
+name = "12 gegen 3 stehen"
+hand = "hard 12"
+dealer = "3"
+index = 2
+when = ">="
+action = "stand"
+group = "I18"
+
+[[deviation]]
+name = "12 gegen 2 stehen"
+hand = "hard 12"
+dealer = "2"
+index = 3
+when = ">="
+action = "stand"
+group = "I18"
+
+[[deviation]]
+name = "11 gegen Ass verdoppeln"
+hand = "hard 11"
+dealer = "A"
+index = 1
+when = ">="
+action = "double"
+group = "I18"
+
+[[deviation]]
+name = "9 gegen 2 verdoppeln"
+hand = "hard 9"
+dealer = "2"
+index = 1
+when = ">="
+action = "double"
+group = "I18"
+
+[[deviation]]
+name = "10 gegen Ass verdoppeln"
+hand = "hard 10"
+dealer = "A"
+index = 4
+when = ">="
+action = "double"
+group = "I18"
+
+[[deviation]]
+name = "9 gegen 7 verdoppeln"
+hand = "hard 9"
+dealer = "7"
+index = 3
+when = ">="
+action = "double"
+group = "I18"
+
+[[deviation]]
+name = "16 gegen 9 stehen"
+hand = "hard 16"
+dealer = "9"
+index = 5
+when = ">="
+action = "stand"
+group = "I18"
+
+[[deviation]]
+name = "13 gegen 2 ziehen"
+hand = "hard 13"
+dealer = "2"
+index = -1
+when = "<"
+action = "hit"
+group = "I18"
+
+[[deviation]]
+name = "12 gegen 4 ziehen"
+hand = "hard 12"
+dealer = "4"
+index = 0
+when = "<"
+action = "hit"
+group = "I18"
+
+[[deviation]]
+name = "12 gegen 5 ziehen"
+hand = "hard 12"
+dealer = "5"
+index = -2
+when = "<"
+action = "hit"
+group = "I18"
+
+[[deviation]]
+name = "12 gegen 6 ziehen"
+hand = "hard 12"
+dealer = "6"
+index = -1
+when = "<"
+action = "hit"
+group = "I18"
+
+[[deviation]]
+name = "13 gegen 3 ziehen"
+hand = "hard 13"
+dealer = "3"
+index = -2
+when = "<"
+action = "hit"
+group = "I18"
+
+# --- Fab 4 (Late Surrender) --------------------------------------------
+
+[[deviation]]
+name = "14 gegen 10 aufgeben"
+hand = "hard 14"
+dealer = "10"
+index = 3
+when = ">="
+action = "surrender"
+else = "no_surrender"
+group = "Fab4"
+
+[[deviation]]
+name = "15 gegen 10 aufgeben"
+hand = "hard 15"
+dealer = "10"
+index = 0
+when = ">="
+action = "surrender"
+else = "no_surrender"
+group = "Fab4"
+
+[[deviation]]
+name = "15 gegen 9 aufgeben"
+hand = "hard 15"
+dealer = "9"
+index = 2
+when = ">="
+action = "surrender"
+else = "no_surrender"
+group = "Fab4"
+
+[[deviation]]
+name = "15 gegen Ass aufgeben"
+hand = "hard 15"
+dealer = "A"
+index = 1
+when = ">="
+action = "surrender"
+else = "no_surrender"
+group = "Fab4"
+
+# Eigene Indizes pro System überschreiben die umgerechneten Werte, z. B.:
+# [overrides.zen]
+# "16 gegen 10 stehen" = 0

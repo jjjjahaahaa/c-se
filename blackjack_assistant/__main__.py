@@ -120,6 +120,7 @@ def cmd_scale(args) -> int:
 
 def cmd_replay(args) -> int:
     from .capture.sources import ImageSequenceSource
+    from .counting.counter import Counter
     from .recognition.pipeline import Recognizer
     from .recognition.recognition_log import RecognitionLogger
 
@@ -134,12 +135,31 @@ def cmd_replay(args) -> int:
         profile.regions.update(json.loads(regions_file.read_text(encoding="utf-8")))
     logger = RecognitionLogger(mode=profile.read_mode)
     recognizer = Recognizer(profile, logger=logger)
+    counter = Counter.from_profile(profile)
     for frame in ImageSequenceSource(args.frames):
         result = recognizer.process_frame(frame.image, frame.timestamp,
                                           origin=tuple(args.origin))
         for event in result.events:
-            print(f"{frame.timestamp:10.2f}  {event.describe()}")
+            counter.apply(event)
+            print(f"{frame.timestamp:10.2f}  {event.describe():42s} {counter.summary()}")
+    stats = counter.shuffle_statistics()
+    if stats.get("shoes"):
+        print(f"Mischstatistik: {stats}")
     print(f"Log: {logger.close()}")
+    return 0
+
+
+def cmd_systems(args) -> int:
+    from .counting.systems import load_systems
+    from .models import VALUE_RANKS
+
+    print(f"{'System':14s} " + " ".join(f"{r:>4s}" for r in VALUE_RANKS) + "   Typ")
+    for key, s in load_systems().items():
+        kind = "ausgeglichen" if s.balanced else f"unausgeglichen (IRC {s.initial_count(6):+g} bei 6 Decks)"
+        if s.ace_side_count:
+            kind += ", Ass-Nebenzähler"
+        values = " ".join(f"{s.values[r]:>+4g}" for r in VALUE_RANKS)
+        print(f"{s.name:14s} {values}   {kind}, Index-Faktor {s.index_factor:.2f}")
     return 0
 
 
@@ -159,6 +179,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("profiles", help="Profile auflisten").set_defaults(func=cmd_profiles)
+    sub.add_parser("systems", help="Zählsysteme anzeigen").set_defaults(func=cmd_systems)
 
     p = sub.add_parser("select-region", help="Bildschirmbereich per Maus festlegen")
     p.add_argument("--profile", required=True)
