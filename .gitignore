@@ -1,0 +1,22 @@
+# Geheimnisse – nie committen
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Laufzeitdaten
+logs/
+results/
+
+# Editor / System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
