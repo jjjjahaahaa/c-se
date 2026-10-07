@@ -16,13 +16,27 @@ from .exact import ExactCalculator, full_shoe, rank_index
 
 DEFAULT_RAMP = [[2, 2], [3, 4], [4, 6], [5, 8]]
 
+_CALCULATORS: dict[tuple, ExactCalculator] = {}
+
+
+def shared_calculator(rules: Rules) -> ExactCalculator:
+    """Ein ExactCalculator pro Regelsatz und Prozess (die Effects of Removal brauchen beim
+    ersten Mal einige Sekunden und werden so nur einmal berechnet)."""
+    key = tuple(sorted(rules.to_dict().items()))
+    if key not in _CALCULATORS:
+        _CALCULATORS[key] = ExactCalculator(rules)
+    return _CALCULATORS[key]
+
 
 class StrategyPlayer:
     """Basic Strategy ohne Zählen (system=None) oder mit Zählsystem."""
 
     def __init__(self, rules: Rules, system: str | None = None, deviations: bool = True,
-                 ramp: list | None = None, name: str | None = None):
+                 ramp: list | None = None, name: str | None = None, flat_bet: bool = False):
+        """flat_bet=True: zählt und spielt Abweichungen, setzt aber immer 1 Einheit
+        (zeigt, wie viel des Vorteils aus der Einsatzvariation kommt)."""
         self.rules = rules
+        self.flat_bet = flat_bet
         self.counting = system is not None
         key = system or "hi_lo"
         self.counter = Counter(key, rules.decks, shuffle_every_round=rules.shuffle_every_round)
@@ -40,7 +54,7 @@ class StrategyPlayer:
         self.counter.round_end()
 
     def bet(self) -> int:
-        if not self.counting:
+        if not self.counting or self.flat_bet:
             return 1
         return self.ramp.advise(self.counter.state()).units
 
@@ -63,9 +77,11 @@ class ExactPlayer:
 
     TC_PER_ADVANTAGE = 1 / 0.005
 
-    def __init__(self, rules: Rules, ramp: list | None = None, name: str = "Exakt (Restzusammensetzung)"):
+    def __init__(self, rules: Rules, ramp: list | None = None,
+                 name: str = "Exakt (Restzusammensetzung)", flat_bet: bool = False):
         self.rules = rules
-        self.calc = ExactCalculator(rules)
+        self.flat_bet = flat_bet
+        self.calc = shared_calculator(rules)
         self.full = full_shoe(rules.decks)
         self.base_ev = self.calc.predeal_ev_linear(self.full)
         self.ramp = sorted((float(t), int(u)) for t, u in (ramp or DEFAULT_RAMP))
@@ -86,6 +102,8 @@ class ExactPlayer:
         return self.calc.predeal_ev_linear(tuple(self.shoe))
 
     def bet(self) -> int:
+        if self.flat_bet:
+            return 1
         tc_equivalent = (self.advantage() - self.base_ev) * self.TC_PER_ADVANTAGE
         units = 1
         for threshold, u in self.ramp:

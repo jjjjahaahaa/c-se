@@ -213,6 +213,7 @@ class SimulationResult:
     wagered: np.ndarray
     shuffles: int
     info: dict = field(default_factory=dict)
+    shoe_ids: np.ndarray | None = None  # Nummer des Schuhs pro Runde (für das Intervall)
 
     @property
     def rounds(self) -> int:
@@ -232,8 +233,14 @@ class SimulationResult:
 
     @property
     def ci95(self) -> float:
-        """Halbe Breite des 95-%-Vertrauensintervalls für den Mittelwert pro Runde."""
-        return 1.96 * self.sd_per_round / np.sqrt(self.rounds)
+        """Halbe Breite des 95-%-Vertrauensintervalls für den Gewinn pro Runde.
+
+        Runden aus demselben Schuh sind nicht unabhängig (der Count koppelt die Einsätze).
+        Deshalb wird – wenn die Schuhnummern bekannt sind – auf Schuh-Ebene gerechnet
+        (Cluster-Standardfehler). Sonst wie bei unabhängigen Runden."""
+        if self.shoe_ids is None:
+            return 1.96 * self.sd_per_round / np.sqrt(self.rounds)
+        return shoe_ci95(*per_shoe(self.shoe_ids, self.nets))
 
     @property
     def ev_per_unit_bet(self) -> float:
@@ -261,6 +268,25 @@ class SimulationResult:
         }
 
 
+def per_shoe(shoe_ids: np.ndarray, values: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Summe der Werte und Anzahl Runden pro Schuh."""
+    _, idx = np.unique(shoe_ids, return_inverse=True)
+    sums = np.bincount(idx, weights=values)
+    counts = np.bincount(idx).astype(float)
+    return sums, counts
+
+
+def shoe_ci95(shoe_net: np.ndarray, shoe_rounds: np.ndarray) -> float:
+    """95-%-Intervall (halbe Breite) für Gewinn/Runde mit dem Schuh als unabhängiger Einheit
+    (Verhältnisschätzer: Summe Gewinn / Summe Runden, Standardfehler nach der Delta-Methode)."""
+    n = len(shoe_net)
+    if n < 2:
+        return float("nan")
+    ev = shoe_net.sum() / shoe_rounds.sum()
+    resid = (shoe_net - ev * shoe_rounds) / shoe_rounds.mean()
+    return float(1.96 * resid.std(ddof=1) / np.sqrt(n))
+
+
 def simulate(player: Player, rules: Rules, rounds: int = 10_000, seed: int = 1,
              mode: str = "shoe") -> SimulationResult:
     """Spielt `rounds` Runden. Gleicher Seed → gleiche Kartenfolge pro Schuh."""
@@ -268,7 +294,75 @@ def simulate(player: Player, rules: Rules, rounds: int = 10_000, seed: int = 1,
     bets = np.empty(rounds)
     nets = np.empty(rounds)
     wagered = np.empty(rounds)
+    shoes = np.empty(rounds, dtype=np.int64)
     for k in range(rounds):
         res = sim.play_round()
         bets[k], nets[k], wagered[k] = res.bet, res.net, res.wagered
-    return SimulationResult(player.name, mode, bets, nets, wagered, sim.shoe.shuffles)
+        shoes[k] = sim.shoe.shuffles
+    return SimulationResult(player.name, mode, bets, nets, wagered, sim.shoe.shuffles,
+                            shoe_ids=shoes)
+
+
+@dataclass
+class ShoeTotals:
+    """Ergebnis eines langen Laufs, zusammengefasst pro Schuh (spart Speicher).
+
+    Alle Varianten mit gleichem Seed spielen exakt dieselben Schuhe (gleiche Mischfolge).
+    Dadurch lassen sich zwei Varianten Schuh für Schuh vergleichen (gepaarter Vergleich)."""
+
+    net: np.ndarray        # Gewinn pro Schuh
+    rounds: np.ndarray     # Runden pro Schuh
+    bets: np.ndarray       # Summe der Starteinsätze pro Schuh
+    sum_sq: float          # Summe der quadrierten Rundenergebnisse (für die Streuung)
+
+    @staticmethod
+    def concat(parts: list["ShoeTotals"]) -> "ShoeTotals":
+        return ShoeTotals(np.concatenate([p.net for p in parts]),
+                          np.concatenate([p.rounds for p in parts]),
+                          np.concatenate([p.bets for p in parts]),
+                          float(sum(p.sum_sq for p in parts)))
+
+    @property
+    def total_rounds(self) -> int:
+        return int(self.rounds.sum())
+
+    @property
+    def ev_per_round(self) -> float:
+        return float(self.net.sum() / self.rounds.sum())
+
+    @property
+    def ci95(self) -> float:
+        return shoe_ci95(self.net, self.rounds)
+
+    @property
+    def ev_per_unit_bet(self) -> float:
+        return float(self.net.sum() / self.bets.sum())
+
+    @property
+    def mean_bet(self) -> float:
+        return float(self.bets.sum() / self.rounds.sum())
+
+    @property
+    def sd_per_round(self) -> float:
+        n = self.rounds.sum()
+        return float(np.sqrt(self.sum_sq / n - (self.net.sum() / n) ** 2))
+
+
+def simulate_shoes(player: Player, rules: Rules, shoes: int, seed: int = 1) -> ShoeTotals:
+    """Spielt genau `shoes` Schuhe (bis zur Schnittkarte) und fasst pro Schuh zusammen."""
+    sim = Simulator(rules, player, seed)
+    net = np.zeros(shoes)
+    rounds = np.zeros(shoes)
+    bets = np.zeros(shoes)
+    sum_sq = 0.0
+    while True:
+        # Vor der Runde mischen, falls nötig – danach gehört die Runde zu diesem Schuh
+        if sim.shoe.needs_shuffle and sim.shoe.shuffles >= shoes:
+            break
+        res = sim.play_round()
+        k = sim.shoe.shuffles - 1
+        net[k] += res.net
+        rounds[k] += 1
+        bets[k] += res.bet
+        sum_sq += res.net * res.net
+    return ShoeTotals(net, rounds, bets, sum_sq)

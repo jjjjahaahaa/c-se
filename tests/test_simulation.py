@@ -150,7 +150,11 @@ def test_kennzahlen():
     assert s["rounds"] == 1000
     assert s["sd_per_round"] == pytest.approx(np.std(res.nets, ddof=1), abs=1e-4)
     assert res.max_drawdown >= 0
-    assert res.ci95 == pytest.approx(1.96 * res.sd_per_round / np.sqrt(1000))
+    # Intervall auf Schuh-Ebene; ohne Schuhnummern wie bei unabhängigen Runden
+    iid = 1.96 * res.sd_per_round / np.sqrt(1000)
+    assert 0.5 * iid < res.ci95 < 2 * iid
+    res.shoe_ids = None
+    assert res.ci95 == pytest.approx(iid)
 
 
 def test_betting_correlation_der_systeme():
@@ -165,9 +169,110 @@ def test_betting_correlation_der_systeme():
 
 
 def test_bericht_wird_erzeugt(tmp_path):
-    assert report_main(["--hands", "200", "--big", "0", "--out", str(tmp_path)]) == 0
+    assert report_main(["--hands", "200", "--big-rounds", "0", "--out", str(tmp_path)]) == 0
     md = (tmp_path / "results.md").read_text(encoding="utf-8")
     assert "Kurzfassung" in md and "Betting Correlation" in md and "Jev" in md
     for name in ("bankroll_10k", "gewinn_pro_runde_10k", "ergebnisse_verteilung", "streuung",
                  "betting_correlation"):
         assert (tmp_path / "img" / f"{name}.png").stat().st_size > 10_000
+
+
+# ----------------------------------------------------------------------
+# Langlauf mit gleichen Schuhen (gepaarter Vergleich)
+# ----------------------------------------------------------------------
+
+
+def test_alle_varianten_spielen_dieselben_schuhe():
+    """Der Schuh wird nur beim Mischen vom Zufallsgenerator berührt → Schuh k ist für alle
+    Spieler gleich, egal wie sie spielen."""
+    from blackjack_assistant.simulation.simulator import Simulator
+
+    firsts = []
+    for player in (StrategyPlayer(RULES), StrategyPlayer(RULES, "zen"), ExactPlayer(RULES)):
+        sim = Simulator(RULES, player, seed=42)
+        orders = []
+        while sim.shoe.shuffles < 3:
+            sim.play_round()
+            if sim.shoe.pos <= 12:
+                orders.append(tuple(sim.shoe.cards[:20]))
+        firsts.append(sorted(set(orders)))
+    assert firsts[0] == firsts[1] == firsts[2]
+
+
+def test_simulation_ueber_schuhe():
+    from blackjack_assistant.simulation.simulator import simulate_shoes
+
+    t = simulate_shoes(StrategyPlayer(RULES, "hi_lo"), RULES, 30, seed=3)
+    assert len(t.net) == 30 and t.rounds.min() > 30
+    assert t.total_rounds == int(t.rounds.sum())
+    assert t.mean_bet > 1 and t.sd_per_round > 1 and t.ci95 > 0
+
+
+def test_flacher_einsatz_zaehlt_aber_setzt_immer_eins():
+    res = simulate(StrategyPlayer(RULES, "hi_lo", flat_bet=True), RULES, 3000, seed=2)
+    assert res.mean_bet == 1
+    exact = simulate(ExactPlayer(RULES, flat_bet=True), RULES, 200, seed=2)
+    assert exact.mean_bet == 1
+
+
+def test_gepaarter_vergleich():
+    from blackjack_assistant.simulation.longrun import paired_difference
+    from blackjack_assistant.simulation.simulator import ShoeTotals
+
+    rng = np.random.default_rng(0)
+    rounds = np.full(4000, 40.0)
+    common = rng.normal(0, 10, 4000)                    # gemeinsamer Schuh-Zufall
+    a = ShoeTotals(common + 0.4, rounds, rounds, 1.0)   # 0.4 / 40 = +1 % pro Runde besser
+    b = ShoeTotals(common + rng.normal(0, 1, 4000), rounds, rounds, 1.0)
+    c = paired_difference(a, b)
+    assert c["diff"] == pytest.approx(0.01, abs=0.002)
+    assert c["ci95"] < 0.002 and c["z"] > 5 and c["corr"] > 0.9
+    # Ohne Paarung (unabhängige Schuhe) wäre der Unterschied nicht messbar
+    assert a.ci95 > 5 * c["ci95"]
+
+
+def test_langlauf_parallel_und_auswertung(tmp_path):
+    from blackjack_assistant.simulation.longrun import run_longrun
+    from blackjack_assistant.simulation.report import analyse_longrun, write_report
+
+    plan = {"basic": 40, "hi_lo": 40, "hi_lo:flat": 40, "hi_lo:spread_only": 40, "zen": 40,
+            "zen:flat": 40, "exact": 6, "exact:flat": 6}
+    big = run_longrun(plan, seed=5, jobs=2, block_shoes=20, log=lambda m: None)
+    assert {k: len(t.net) for k, t in big.items()} == plan
+    # gleiche Schuhe: Basic und Hi-Lo flach unterscheiden sich nur bei Abweichungen → stark korreliert
+    lr = analyse_longrun(big)
+    corr = [c for c in lr["decomposition"] if c["a"] == "hi_lo:flat" and c["b"] == "basic"][0]["corr"]
+    assert corr > 0.8
+    assert len(lr["pairwise"]) == 1 and lr["z_bonferroni"] == pytest.approx(1.96, abs=0.01)
+    assert set(lr["shares"]) == {"hi_lo", "zen"}
+    # Bericht mit Langlauf-Abschnitten
+    from blackjack_assistant.simulation import report
+
+    s = {"created": "x", "seed": 1, "runtime_s": 60,
+         "settings": {"block_shoes": 20, "jobs": 2, "hands": 100},
+         "ramp_table": report.ramp_table(), "index_table": report.index_table(),
+         "runs_10k": [{"key": k, "mode": m, "name": k, "net": 0, "ev_per_round": 0, "ci95": 0.01,
+                       "ev_per_unit_bet": 0, "sd_per_round": 1, "mean_bet": 1, "max_drawdown": 0,
+                       "rounds": 100, "shuffles": 3 if m == "shoe" else 100}
+                      for k in ("basic", "hi_lo") for m in ("shoe", "every_round")],
+         "jev_note": None, "longrun": lr, "eor": {"2": 0.0007}, "base_ev": -0.0034,
+         "betting_correlation": {"hi_lo": {"bc": 0.96}}}
+    write_report(s, tmp_path / "r.md")
+    md = (tmp_path / "r.md").read_text(encoding="utf-8")
+    for heading in ("Einsatzstaffelung", "Abweichungen (Indizes)", "Statistische Signifikanz",
+                    "Woher kommt der Vorteil", "95-%-Vertrauensintervall", "Näherung"):
+        assert heading in md, heading
+
+
+def test_index_und_staffelungstabelle():
+    from blackjack_assistant.simulation.report import index_table, ramp_table
+
+    ramps = ramp_table()
+    assert ramps["hi_lo"] == [2, 3, 4, 5]
+    assert ramps["zen"] == pytest.approx([3.4, 5.1, 6.8, 8.5])
+    assert ramps["ko"][2] == pytest.approx(4)                # TC 4 = Pivot +4
+    rows = {r["name"]: r for r in index_table()}
+    ins = rows["Versicherung"]
+    assert ins["hilo"] == 3 and ins["systems"]["ko"] == 3     # KO fest ab +3
+    assert rows["16 gegen 10 stehen"]["systems"]["zen"] == pytest.approx(0)
+    assert rows["10,10 gegen 6 teilen"]["systems"]["hi_opt_2"] == pytest.approx(6.0)

@@ -352,16 +352,24 @@ python -m blackjack_assistant run --profile mock_casino --engine jev
 ## Auswertung (Phase 6)
 
 ```bash
-python -m blackjack_assistant simulate                               # alles (ca. 10 min)
-python -m blackjack_assistant simulate -- --hands 10000 --big 0      # nur 10'000 Hände
+python -m blackjack_assistant simulate                                   # alles (ca. 80 min, 4 Kerne)
+python -m blackjack_assistant simulate -- --big-rounds 0                 # nur 10'000 Hände (ca. 1 min)
+python -m blackjack_assistant simulate -- --big-rounds 1000000 --exact-rounds 100000   # kürzer
+python -m blackjack_assistant simulate -- --report-only                  # Bericht aus results.json neu
 ```
 
-Simuliert ohne Bildschirm mit gleichem Seed: Basic Strategy ohne Zählen, alle sechs
-Zählsysteme (mit Abweichungen und Einsatzstaffelung), die exakte Strategie
-(Restzusammensetzung, theoretisches Maximum) und – mit API-Key – Jev mit Count. Jeweils mit
-tiefem Schuh (75 %) und mit Mischen nach jeder Runde. Dazu ein Langlauf (500'000 Runden pro
-Variante, parallel auf mehreren Prozessorkernen), weil 10'000 Hände für sichere Aussagen zu
-wenig sind. Ergebnis: [docs/results.md](docs/results.md) mit Tabellen und Grafiken.
+1. **10'000 Hände** pro Variante (wie gefordert) mit gleichem Seed: Basic Strategy ohne Zählen,
+   sechs Zählsysteme (Abweichungen + Spread 1–8), exakte Strategie, Jev + Hi-Lo (nur mit
+   API-Key) – jeweils mit tiefem Schuh (75 %) und mit Mischen nach jeder Runde.
+2. **Langlauf** mit 10 Mio. Runden pro Zählsystem (1 Mio. für die exakte Strategie), parallel.
+   Alle Varianten spielen **dieselben Schuhe**; Unterschiede werden Schuh für Schuh verglichen
+   (gepaarter Vergleich) und mit 95-%-Vertrauensintervallen und Bonferroni-Korrektur bewertet.
+   Zusätzlich jede Variante mit **flachem Einsatz** (gleiche Spielzüge, immer 1 Einheit) und
+   Hi-Lo nur mit Einsatzstaffelung – das zeigt, woher der Vorteil kommt.
+3. Betting Correlation der Systeme (ohne Zufall, aus den exakten Effects of Removal).
+
+Ergebnis: [docs/results.md](docs/results.md) mit Tabellen und Grafiken, alle Zahlen in
+`docs/results.json`, Rohdaten pro Schuh in `results/longrun.npz` (nicht im Git).
 
 ## Konfiguration und Geheimnisse
 

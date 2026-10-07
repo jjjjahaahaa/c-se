@@ -107,8 +107,8 @@ In der Entwicklungsumgebung gab es keinen API-Key; getestet wurde mit einer nach
 
 | # | Befehl / Aktion | Erwartetes Ergebnis | OK? |
 |---|---|---|---|
-| E1 | `python -m blackjack_assistant simulate -- --hands 10000 --big 0` | Läuft ca. 1 Minute, schreibt `docs/results.md` und `docs/img/*.png` | |
-| E2 | `python -m blackjack_assistant simulate` (mit Langlauf) | Ca. 10 Minuten; Zahlen identisch mit dem eingecheckten `docs/results.md` (gleicher Seed) | |
+| E1 | `python -m blackjack_assistant simulate -- --big-rounds 0 --out logs/sim_test` | Läuft ca. 1 Minute, schreibt `logs/sim_test/results.md` und Grafiken (Teil „10'000 Hände“ identisch mit `docs/results.md`) | |
+| E2 | `python -m blackjack_assistant simulate` (mit Langlauf) | Ca. 80 Minuten auf 4 Kernen (mit `--jobs` anpassen); Zahlen identisch mit dem eingecheckten `docs/results.md` (gleicher Seed, gleiche Blöcke) | |
 | E3 | Optional mit Jev-API-Key: E1 wiederholen | Zusätzliche Variante „Jev + Hi-Lo“ in Tabelle und Grafiken (dauert lange, kostet laut Preisliste weniger als 1 USD) | |
 
 ## F. Alle Tests
