@@ -72,14 +72,34 @@ und mindestens 97 % im Tisch-Modus.
 ## Phase 3 – Zählen und Strategie
 
 **Aufgaben**
-1. Hi-Lo: 2–6 = +1, 7–9 = 0, 10–A = −1. Running Count, verbleibende Decks
-   (`Decks im Profil − gesehene Karten / 52`, auf halbe Decks gerundet), True Count.
+1. Zählsystem konfigurierbar (pro Profil und in der Simulation). Die Kartenwerte stehen
+   als Tabelle in `config/counting_systems.toml`, nicht im Code:
+
+   | Rang | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10/B/D/K | A | Typ |
+   |---|---|---|---|---|---|---|---|---|---|---|---|
+   | Hi-Lo | +1 | +1 | +1 | +1 | +1 | 0 | 0 | 0 | −1 | −1 | ausgeglichen |
+   | KO | +1 | +1 | +1 | +1 | +1 | +1 | 0 | 0 | −1 | −1 | unausgeglichen |
+   | Hi-Opt II | +1 | +1 | +2 | +2 | +1 | +1 | 0 | 0 | −2 | 0 | ausgeglichen, Ass-Nebenzähler |
+   | Omega II | +1 | +1 | +2 | +2 | +2 | +1 | 0 | −1 | −2 | 0 | ausgeglichen, Ass-Nebenzähler |
+   | Zen Count | +1 | +1 | +2 | +2 | +2 | +1 | 0 | 0 | −2 | −1 | ausgeglichen |
+   | Wong Halves | +0.5 | +1 | +1 | +1.5 | +1 | +0.5 | 0 | −0.5 | −1 | −1 | ausgeglichen |
+
+   - Ausgeglichene Systeme: Running Count → True Count (RC / verbleibende Decks).
+   - Unausgeglichen (KO): Start-Count (IRC = 4 − 4 × Decks), Entscheidungen über feste
+     Schwellen (Key Count, Pivot), kein True Count.
+   - Hi-Opt II und Omega II: separater Ass-Nebenzähler. Für Einsatz und Insurance wird
+     der Count um den Ass-Überschuss bzw. -Mangel korrigiert (Faktor pro System in der Konfiguration).
+   - Verbleibende Decks: `Decks im Profil − gesehene Karten / 52`, auf halbe Decks gerundet.
 2. Misch-Erkennung setzt den Count zurück. Option "Spiel mischt jede Runde":
    Count nach jeder Runde auf 0, Warnung "Zählen hier wirkungslos".
 3. Statistik im Log: Anzahl Runden zwischen zwei Mischvorgängen.
 4. Basic Strategy als Tabellen (hart, soft, Paare, Surrender) für 6 Decks, S17, DAS,
    Late Surrender. Regeln pro Profil anpassbar (z. B. H17, kein DAS, kein Surrender).
 5. Illustrious 18 (und Fab 4 für Surrender) abhängig vom True Count, inkl. Insurance.
+   Die Indizes sind systemspezifisch und stehen ebenfalls in der Konfiguration.
+   Mitgeliefert werden die veröffentlichten Hi-Lo-Indizes; für die anderen Systeme
+   werden sie über den Level des Systems umgerechnet (Näherung, wird im Bericht
+   vermerkt). Für KO gelten feste Schwellen statt True-Count-Indizes.
 6. Einsatzempfehlung: 1 Einheit bis TC +1, danach steigend; Staffelung im Profil.
 7. Unit Tests für Zählung, True Count, Strategie und Abweichungen.
 
@@ -120,12 +140,36 @@ und mindestens 97 % im Tisch-Modus.
 **Aufgaben**
 1. Simulator ohne Bildschirm, gleicher Seed für alle Varianten, 10'000 Hände:
    (a) Basic Strategy ohne Zählen, (b) Basic Strategy + Hi-Lo (Deviations + Einsatz),
-   (c) Jev mit Count (ohne Key: übersprungen bzw. markiert).
-2. Vergleich tiefer Schuh (75 % Penetration) vs. Mischen nach jeder Runde.
-3. Grafiken (matplotlib): Guthabenverlauf, Gewinn pro Hand, Varianz/Streuung.
-4. `docs/results.md`: kurze Zusammenfassung mit Tabellen und Grafiken.
+   (c) Jev mit Count (ohne Key: übersprungen bzw. markiert),
+   (d) jedes konfigurierte Zählsystem (Hi-Lo, KO, Hi-Opt II, Omega II, Zen, Wong Halves),
+   (e) **exakte Strategie** (composition-dependent): merkt sich alle gespielten Karten
+       und berechnet für jede Entscheidung den Erwartungswert aus der genauen
+       Restzusammensetzung des Schuhs (Dealer-Wahrscheinlichkeiten rekursiv, Hit/Stand/
+       Double/Surrender exakt, Split mit der üblichen Näherung). Einsatz nach dem
+       berechneten Vorteil vor dem Austeilen. Rechenintensiv: Zwischenergebnisse werden
+       pro Restzusammensetzung zwischengespeichert.
+2. Vergleich aller Zählsysteme gegen die exakte Strategie als theoretisches Maximum
+   (Anteil des maximal erreichbaren Vorteils, der mit dem System erreicht wird).
+3. Vergleich tiefer Schuh (75 % Penetration) vs. Mischen nach jeder Runde.
+4. Grafiken (matplotlib): Guthabenverlauf, Gewinn pro Hand, Varianz/Streuung.
+5. `docs/results.md`: kurze Zusammenfassung mit Tabellen und Grafiken.
 
 **Abnahme**: Ein Befehl erzeugt alle Grafiken und den Bericht reproduzierbar.
+
+---
+
+## Testbarkeit ohne Bildschirm
+
+Phase 1, 3 und 6 laufen und testen vollständig ohne Display (z. B. in CI):
+
+- Kein Modul aus `counting`, `strategy` oder `simulation` importiert `tkinter`, `mss`
+  oder `pynput`. Diese Bibliotheken werden nur in `capture` und `overlay` importiert.
+- Die Spiellogik des Mock-Casinos ist vom DOM getrennt (`rules.js`, `shoe.js`, `game.js`)
+  und wird in den Tests in einem Headless-Browser (Playwright) ausgeführt. Ist Playwright
+  nicht installiert, werden diese Tests übersprungen, alle anderen laufen trotzdem.
+- Phase 2 und 4 werden lokal mit Bildschirm getestet. Die reinen Logikteile davon
+  (Positions-Tracking, Listenvergleich, Stabilitätsprüfung) arbeiten auf Bildern bzw.
+  Listen und sind ebenfalls ohne Display testbar.
 
 ---
 
@@ -138,4 +182,6 @@ und mindestens 97 % im Tisch-Modus.
 | Externe Spiele mischen jede Runde | Option im Profil, Warnung im Overlay, Nachweis in Phase 6 |
 | Globale Hotkeys brauchen unter macOS Berechtigungen | Hinweis in der README, Fallback auf Tasten im Overlay-Fenster |
 | Jev-API ändert sich oder ist nicht erreichbar | Austauschbare Engine, automatischer Fallback |
+| Exakte Strategie ist langsam | Caching pro Restzusammensetzung, Anzahl Hände per Parameter |
+| Deviation-Indizes für andere Systeme sind nur Näherungen | Im Bericht kennzeichnen, Indizes in der Konfiguration überschreibbar |
 | 10'000 Hände sind statistisch wenig | Varianz/Standardabweichung mit ausweisen, optional mehr Hände per Parameter |

@@ -19,11 +19,11 @@ und mit dem **Demo-Modus (Spielgeld)** von Online-Casinos.
 |---|---|
 | Mock-Casino | Blackjack im Browser (HTML/JS), 6 Decks, 75 % Penetration, S17, 3:2, Double, Split, Late Surrender, Verlaufs-Panel, Debug-Log (Ground Truth) |
 | Erkennung | Bildschirmaufnahme (mss), Template Matching auf der Kartenecke (OpenCV), Tisch-Modus und Verlaufs-Modus, Kalibrierung für fremde Spiele, Profile |
-| Zählen | Hi-Lo, Running Count, verbleibende Decks, True Count, Misch-Erkennung |
+| Zählen | Hi-Lo, KO, Hi-Opt II, Omega II, Zen, Wong Halves (konfigurierbar), Running Count, verbleibende Decks, True Count, Misch-Erkennung |
 | Strategie | Basic Strategy (Tabellen), Illustrious 18, Einsatzstaffelung |
 | Overlay | tkinter-Fenster, immer im Vordergrund, Hotkeys |
 | Jev (optional) | Entscheidung über die TypeSafe-Jev-API, Fallback auf lokale Strategie |
-| Simulation | 10'000 Hände ohne Bildschirm, Vergleich der Strategien, Grafiken, Markdown-Bericht |
+| Simulation | 10'000 Hände ohne Bildschirm, Vergleich der Strategien und Zählsysteme gegen eine exakte Strategie, Grafiken, Markdown-Bericht |
 
 ---
 
@@ -92,6 +92,9 @@ c-se/
 ├── .gitignore                 u. a. .env, venv, logs
 ├── .env.example               Vorlage für JEV_API_KEY (ohne echten Key)
 │
+├── config/
+│   └── counting_systems.toml  Kartenwerte und Indizes aller Zählsysteme
+│
 ├── mock_casino/               PHASE 1 – lokale Blackjack-Webseite
 │   ├── server.py              http.server + Endpunkt für das Ground-Truth-Log
 │   ├── index.html
@@ -120,7 +123,8 @@ c-se/
 │   │   ├── calibration.py     Kalibrierung für externe Spiele
 │   │   └── recognition_log.py Log mit Mini-Screenshot pro Karte
 │   ├── counting/              PHASE 3
-│   │   └── hilo.py            Running Count, True Count, Decks, Misch-Statistik
+│   │   ├── systems.py         Zählsysteme aus der Konfiguration laden
+│   │   └── counter.py         Running/True Count, Ass-Nebenzähler, Decks, Misch-Statistik
 │   ├── strategy/              PHASE 3 + 5
 │   │   ├── engine.py          Schnittstelle DecisionEngine
 │   │   ├── basic.py           Basic-Strategy-Tabellen
@@ -132,7 +136,8 @@ c-se/
 │   │   └── hotkeys.py         Pause, Reset, Profilwechsel
 │   └── simulation/            PHASE 6
 │       ├── simulator.py       Blackjack-Simulation mit Seed
-│       ├── players.py         Spielertypen (Basic, Hi-Lo, Jev)
+│       ├── players.py         Spielertypen (Basic, Zählsysteme, Jev, exakt)
+│       ├── exact.py           Composition-dependent Erwartungswerte
 │       └── report.py          Grafiken + Markdown-Zusammenfassung
 │
 ├── profiles/                  Ein Ordner pro Spiel
@@ -141,6 +146,7 @@ c-se/
 │       └── templates/         Rang-Templates (PNG)
 │
 ├── tools/
+│   ├── generate_card_svgs.py  Karten-SVGs für das Mock-Casino erzeugen
 │   ├── generate_templates.py  Templates aus den Mock-Casino-SVGs erzeugen
 │   └── measure_accuracy.py    Erkennung vs. Ground Truth → Genauigkeit in %
 │
