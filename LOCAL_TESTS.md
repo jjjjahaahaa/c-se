@@ -100,3 +100,20 @@ In der Entwicklungsumgebung gab es keinen API-Key; getestet wurde mit einer nach
 | D5 | `run --profile mock_casino --engine jev`, Runde spielen | Kurz „Lokale Strategie: Jev rechnet …“, danach Spielzug mit „Jev: Konfidenz …“ und Wahrscheinlichkeiten | |
 | D6 | Falschen Key eintragen, D5 wiederholen | Meldung „Jev lehnt den API-Key ab“, Empfehlungen kommen von der lokalen Strategie | |
 | D7 | Internet trennen, D5 wiederholen | „Jev nicht erreichbar … → lokale Strategie“, Programm läuft weiter | |
+
+---
+
+## E. Auswertung (Phase 6, kein Bildschirm nötig)
+
+| # | Befehl / Aktion | Erwartetes Ergebnis | OK? |
+|---|---|---|---|
+| E1 | `python -m blackjack_assistant simulate -- --hands 10000 --big 0` | Läuft ca. 1 Minute, schreibt `docs/results.md` und `docs/img/*.png` | |
+| E2 | `python -m blackjack_assistant simulate` (mit Langlauf) | Ca. 10 Minuten; Zahlen identisch mit dem eingecheckten `docs/results.md` (gleicher Seed) | |
+| E3 | Optional mit Jev-API-Key: E1 wiederholen | Zusätzliche Variante „Jev + Hi-Lo“ in Tabelle und Grafiken (dauert lange, kostet laut Preisliste weniger als 1 USD) | |
+
+## F. Alle Tests
+
+| # | Befehl | Erwartetes Ergebnis | OK? |
+|---|---|---|---|
+| F1 | `pytest` | Alles grün; übersprungen nur `test_echte_jev_anfrage` (ohne Key) | |
+| F2 | `pytest -m display` | GUI-Tests auf dem echten Bildschirm grün (Fenster erscheinen kurz) | |

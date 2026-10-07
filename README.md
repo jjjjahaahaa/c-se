@@ -81,80 +81,92 @@ Es gibt zwei Implementierungen:
 
 ---
 
-## Ordnerstruktur (Zielzustand)
+## Ordnerstruktur
 
 ```
 c-se/
 ├── README.md                  Dieses Dokument
 ├── PLAN.md                    Phasenplan mit Aufgaben und Abnahmekriterien
+├── CHANGELOG.md               Was pro Phase gemacht wurde + offene Entscheidungen
+├── LOCAL_TESTS.md             Checkliste für Tests mit echtem Bildschirm
 ├── requirements.txt           Python-Abhängigkeiten
 ├── pyproject.toml             Projekt- und pytest-Konfiguration
 ├── .gitignore                 u. a. .env, venv, logs
-├── .env.example               Vorlage für JEV_API_KEY (ohne echten Key)
+├── .env.example               Vorlage für den Jev-API-Key (ohne echten Key)
 │
 ├── config/
-│   └── counting_systems.toml  Kartenwerte und Indizes aller Zählsysteme
+│   ├── counting_systems.toml  Kartenwerte der Zählsysteme (Hi-Lo, KO, Hi-Opt II, …)
+│   ├── basic_strategy.toml    Basic-Strategy-Tabelle (6 Decks, S17, DAS, LS) + H17
+│   └── deviations.toml        Illustrious 18 + Fab 4 (Indizes)
 │
 ├── mock_casino/               PHASE 1 – lokale Blackjack-Webseite
-│   ├── server.py              http.server + Endpunkt für das Ground-Truth-Log
-│   ├── index.html
-│   ├── css/style.css
+│   ├── server.py              http.server + Endpunkte für Konfiguration und Ground Truth
+│   ├── index.html, css/       Oberfläche (dunkelgrüner Tisch, Verlaufs-Panel)
 │   ├── js/
-│   │   ├── shoe.js            Schuh, Mischen, Penetration
-│   │   ├── rules.js           Handwerte, Dealer-Logik, Auszahlungen
-│   │   ├── game.js            Spielablauf (Deal, Hit, Stand, Double, Split, Surrender)
-│   │   ├── cards.js           Zuordnung Karte → SVG, Verlaufs-Kacheln
-│   │   ├── logger.js          Ereignisse an den Server senden (Ground Truth)
-│   │   └── ui.js              Tisch, Verlaufs-Panel, Mischanzeige, Tastatur
+│   │   ├── rules.js           Handwerte, Dealer-Logik, erlaubte Aktionen, Auszahlungen
+│   │   ├── shoe.js            Schuh, Fisher-Yates-Mischen, Schnittkarte, Seed
+│   │   ├── game.js            Rundenablauf (ohne DOM, testbar)
+│   │   ├── cards.js           Karte → SVG, Verlaufs-Kacheln
+│   │   ├── logger.js          Ereignisse an den Server (Ground Truth)
+│   │   └── ui.js              Darstellung, Tastatur, Einstellungen, Autoplay
 │   └── assets/cards/          Karten-SVGs (erzeugt von tools/generate_card_svgs.py)
 │
 ├── blackjack_assistant/       Python-Paket
-│   ├── __main__.py            Startpunkt: python -m blackjack_assistant
-│   ├── models.py              Card, CardEvent, HandState, Decision …
+│   ├── __main__.py            Kommandozeile: python -m blackjack_assistant <Befehl>
+│   ├── models.py              Ränge, Regeln, HandState, Decision, Action
 │   ├── profiles.py            Profile laden/speichern/umschalten
+│   ├── app.py                 PHASE 4 – Assistant (Logik) + Worker-Thread + Start
 │   ├── capture/               PHASE 2 – Bildschirmaufnahme
-│   │   ├── screen.py          mss-Aufnahme eines Bereichs
+│   │   ├── screen.py          mss-Aufnahme
+│   │   ├── sources.py         Bildquellen (Bildschirm, Screenshots, Headless-Browser)
 │   │   ├── region_select.py   Bereich per Maus aufziehen
 │   │   └── stability.py       "Bild 300 ms unverändert"-Prüfung
 │   ├── recognition/           PHASE 2 – Kartenerkennung
-│   │   ├── matcher.py         Template Matching auf der Kartenecke
-│   │   ├── templates.py       Templates laden, aus SVG erzeugen
-│   │   ├── table_mode.py      Tisch-Modus: Positions-Tracking, Rundenende
+│   │   ├── templates.py       Templates laden/speichern/skalieren
+│   │   ├── matcher.py         Template Matching, Orientierungsprüfung, Skalierungssuche
+│   │   ├── table_mode.py      Tisch-Modus: Tracking pro Runde, Rundenende, ungesehene Karten
 │   │   ├── history_mode.py    Verlaufs-Modus: Listenvergleich, Panel leer = Mischen
-│   │   ├── calibration.py     Kalibrierung für externe Spiele
-│   │   └── recognition_log.py Log mit Mini-Screenshot pro Karte
+│   │   ├── pipeline.py        Bereiche → Stabilität → Matching → Tracking
+│   │   ├── events.py          Ereignisse (neue Karte, unsicher, ungesehen, …)
+│   │   ├── calibration.py     Kalibrierung für externe Spiele (J/Q/K und B/D/K)
+│   │   └── recognition_log.py Log mit Mini-Screenshot pro Karte + index.html
 │   ├── counting/              PHASE 3
-│   │   ├── systems.py         Zählsysteme aus der Konfiguration laden
-│   │   └── counter.py         Running/True Count, Ass-Nebenzähler, Decks, Misch-Statistik
+│   │   ├── systems.py         Zählsysteme aus der Konfiguration
+│   │   └── counter.py         Running/True Count, Restdecks, Ass-Nebenzähler, Mischstatistik
 │   ├── strategy/              PHASE 3 + 5
-│   │   ├── engine.py          Schnittstelle DecisionEngine
-│   │   ├── basic.py           Basic-Strategy-Tabellen
-│   │   ├── deviations.py      Illustrious 18
+│   │   ├── engine.py          Schnittstelle DecisionEngine + StrategyEngine
+│   │   ├── basic.py           Basic Strategy + Regelanpassungen
+│   │   ├── deviations.py      Index-Abweichungen
 │   │   ├── betting.py         Einsatzstaffelung
-│   │   └── jev.py             Jev-Anbindung (optional)
+│   │   └── jev.py             Jev-Anbindung (optional, mit Rückfall)
 │   ├── overlay/               PHASE 4
 │   │   ├── window.py          tkinter-Fenster
-│   │   └── hotkeys.py         Pause, Reset, Profilwechsel
+│   │   └── hotkeys.py         globale Hotkeys (pynput)
 │   └── simulation/            PHASE 6
 │       ├── simulator.py       Blackjack-Simulation mit Seed
 │       ├── players.py         Spielertypen (Basic, Zählsysteme, Jev, exakt)
-│       ├── exact.py           Composition-dependent Erwartungswerte
-│       └── report.py          Grafiken + Markdown-Zusammenfassung
+│       ├── exact.py           Exakte Erwartungswerte aus der Restzusammensetzung
+│       └── report.py          Grafiken + Markdown-Bericht
 │
-├── profiles/                  Ein Ordner pro Spiel
-│   └── mock_casino/
-│       ├── profile.json       Bereiche, Lesemodus, Regeln, Decks, Konfidenz
-│       └── templates/         Rang-Templates (PNG)
+├── profiles/                  Ein Ordner pro Spiel (profile.json + templates/)
+│   ├── mock_casino/
+│   └── playtech_blackjack_surrender/
 │
 ├── tools/
 │   ├── generate_card_svgs.py  Karten-SVGs für das Mock-Casino erzeugen
-│   ├── generate_templates.py  Templates aus den Mock-Casino-SVGs erzeugen
-│   └── measure_accuracy.py    Erkennung vs. Ground Truth → Genauigkeit in %
+│   ├── generate_templates.py  Templates aus den SVGs erzeugen (Headless-Browser)
+│   ├── make_test_screenshots.py  Test-Screenshots für tests/data erzeugen
+│   ├── record_mock_session.py Erkennung im Headless-Browser gegen Ground Truth messen
+│   ├── screen_demo.py         Gesamtablauf mit sichtbarem Browser und Overlay
+│   ├── measure_accuracy.py    Erkennung vs. Ground Truth → Genauigkeit in %
+│   └── browser.py             Chromium für Playwright starten
 │
-├── tests/                     pytest Unit Tests
+├── tests/                     pytest (tests/data: Screenshots mit erwarteten Karten)
 ├── logs/                      Laufzeit-Logs (nicht im Git)
 └── docs/
-    └── results.md             Ergebnisse der Auswertung (Phase 6)
+    ├── results.md             Ergebnisse der Auswertung (Phase 6)
+    ├── results.json           Alle Kennzahlen maschinenlesbar
+    └── img/                   Grafiken
 ```
 
 ---
@@ -336,6 +348,20 @@ python -m blackjack_assistant run --profile mock_casino --engine jev
 - Im Overlay läuft die Anfrage im Hintergrund; bis die Antwort da ist, steht die Empfehlung
   der lokalen Strategie da („Jev rechnet …“). Gleiche Situationen werden nur einmal angefragt.
 - Versicherung entscheidet weiterhin die lokale Strategie.
+
+## Auswertung (Phase 6)
+
+```bash
+python -m blackjack_assistant simulate                               # alles (ca. 10 min)
+python -m blackjack_assistant simulate -- --hands 10000 --big 0      # nur 10'000 Hände
+```
+
+Simuliert ohne Bildschirm mit gleichem Seed: Basic Strategy ohne Zählen, alle sechs
+Zählsysteme (mit Abweichungen und Einsatzstaffelung), die exakte Strategie
+(Restzusammensetzung, theoretisches Maximum) und – mit API-Key – Jev mit Count. Jeweils mit
+tiefem Schuh (75 %) und mit Mischen nach jeder Runde. Dazu ein Langlauf (500'000 Runden pro
+Variante, parallel auf mehreren Prozessorkernen), weil 10'000 Hände für sichere Aussagen zu
+wenig sind. Ergebnis: [docs/results.md](docs/results.md) mit Tabellen und Grafiken.
 
 ## Konfiguration und Geheimnisse
 

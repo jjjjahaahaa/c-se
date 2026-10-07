@@ -193,6 +193,13 @@ def cmd_jev_check(args) -> int:
     return 0 if decision.source == "jev" else 1
 
 
+def cmd_simulate(args) -> int:
+    from .simulation.report import main as simulate_main
+
+    rest = [a for a in args.rest if a != "--"]
+    return simulate_main(rest)
+
+
 def cmd_run(args) -> int:
     from .app import run_app
 
@@ -240,6 +247,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("jev-check", help="Verbindung zu Jev testen (braucht API-Key)").set_defaults(
         func=cmd_jev_check)
+
+    p = sub.add_parser("simulate", help="Simulation und Auswertung (Phase 6)",
+                       description="Optionen nach '--' werden weitergereicht, z. B. "
+                                   "simulate -- --hands 10000 --big 0")
+    p.add_argument("rest", nargs=argparse.REMAINDER)
+    p.set_defaults(func=cmd_simulate)
 
     p = sub.add_parser("run", help="Assistent mit Overlay starten")
     p.add_argument("--profile", help="Profil (Standard: erstes Profil)")

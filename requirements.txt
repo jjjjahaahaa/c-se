@@ -13,6 +13,9 @@ pynput>=1.7                      # globale Hotkeys
 requests>=2.31                   # HTTP-Anfragen an die Jev-API
 python-dotenv>=1.0               # lädt eine lokale .env (API-Key), die nie committet wird
 
+# --- Auswertung (Phase 6) -----------------------------------------------
+matplotlib>=3.8                  # Grafiken für docs/results.md
+
 # --- Tests ------------------------------------------------------------
 pytest>=8.0
 # Browser-Tests für das Mock-Casino (Headless, kein Bildschirm nötig).

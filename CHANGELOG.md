@@ -274,3 +274,93 @@ Ein echter Test (`test_echte_jev_anfrage`) läuft automatisch, sobald ein Key ge
   Zustand = Hand, Dealer-Karte, True Count). Mit `JevEngine(advice=True)` lässt sich das einschalten.
 - Modell `jev-latest` (änderbar über `TYPESAFE_DEFAULT_MODEL`, für reproduzierbare Vergleiche
   z. B. `jev-1.13.0`).
+
+---
+
+## Phase 6 – Auswertung
+
+- **Simulator** (`simulation/simulator.py`) ohne Bildschirm, mit denselben Regeln wie das
+  Mock-Casino (Peek, Versicherung, 3:2, Double/DAS, Split bis 4 Hände, Late Surrender,
+  S17/H17, Seven-Card Charlie) und festem Seed. Geprüft: Basic Strategy über 2 Mio. Runden
+  −0,32 % ± 0,16 % – passt zum exakt berechneten Hausvorteil von −0,337 %.
+- **Spieler** (`simulation/players.py`): Basic Strategy ohne Zählen (flach), jedes Zählsystem
+  mit Abweichungen und Spread 1–8, exakte Strategie (Restzusammensetzung, Einsatz nach
+  berechnetem Vorteil), Jev + Hi-Lo (nur mit API-Key).
+- **Bericht** (`simulation/report.py`, Befehl `simulate`): 10'000 Hände pro Variante in beiden
+  Modi (75 % Penetration / Mischen nach jeder Runde), Langlauf mit 500'000 Runden pro Variante
+  (parallel auf 4 Prozessen), Betting Correlation aller Systeme aus den exakten Effects of
+  Removal, 7 Grafiken (matplotlib) und `docs/results.md` + `docs/results.json`.
+  Laufzeit ca. 9 Minuten; Ergebnisse sind reproduzierbar (zweimal gerechnet, identisch).
+
+**Ergebnisse** (Details in [docs/results.md](docs/results.md))
+
+| Variante (75 % Penetration) | 10'000 Hände | Langlauf 500'000: pro Runde | Anteil am Maximum |
+|---|---:|---:|---:|
+| Basic Strategy (ohne Zählen) | −211 Einheiten | −0,17 % ± 0,32 % | – |
+| Hi-Lo | +262 | +1,37 % ± 0,66 % | 55 % |
+| KO | +199 | +1,41 % ± 0,67 % | 56 % |
+| Hi-Opt II | +320 | +1,56 % ± 0,73 % | 62 % |
+| Omega II | +239 | +1,56 % ± 0,73 % | 62 % |
+| Zen Count | +189 | +1,43 % ± 0,67 % | 57 % |
+| Wong Halves | +213 | +1,26 % ± 0,68 % | 51 % |
+| Exakt (theoretisches Maximum) | +266 | +2,63 % ± 0,88 % | 100 % |
+| Jev + Hi-Lo | nicht simuliert (kein API-Key) | | |
+
+- Mischen nach jeder Runde: alle Zählsysteme identisch mit Basic Strategy (1 Einheit, gleiche
+  Ergebnisse), Zählen ist wirkungslos.
+- 10'000 Hände sind zu wenig für eine Rangliste: Der Zufallsspielraum (±2,2 bis ±6,2 % pro
+  Runde) ist grösser als die Unterschiede. Deshalb zusätzlich der Langlauf.
+- Ohne Zufall (Betting Correlation): Wong Halves 0,993, Omega II mit Ass-Korrektur 0,981,
+  Hi-Opt II mit Ass-Korrektur 0,973, Hi-Lo 0,961, Zen 0,959, KO 0,958.
+
+**Tests**: Regeln des Simulators mit vorgegebenen Karten (Blackjack, Dealer-Blackjack,
+Surrender, Double, Push, Überkaufen, S17/H17, gesplittete Asse, Versicherung, Seven-Card
+Charlie), gleicher Seed = gleiches Ergebnis, Schnittkarte/Mischen jede Runde, Zähler spielt
+Basic Strategy bei jeder Runde gemischt, Hausvorteil über 200'000 Runden, exakter Spieler,
+Kennzahlen, Betting Correlation, Bericht mit allen Grafiken.
+
+**Offene Entscheidungen**
+- **Jev** wurde nicht simuliert (kein API-Key). Mit Key erscheint die Variante automatisch.
+  Hinweis: 10'000 Hände bedeuten rund 15'000 API-Anfragen (Kosten laut Preisliste etwa
+  0,40 USD, Dauer je nach Antwortzeit über eine Stunde).
+- Die exakte Strategie setzt nach dem linear geschätzten Vorteil (Effects of Removal), weil eine
+  vollständige Berechnung pro Runde zu langsam wäre (0,5 s statt 10 µs). Umrechnung:
+  0,5 % Vorteil ≈ 1 Hi-Lo-True-Count, dieselbe Staffelung. Sie setzt damit im Mittel etwas mehr
+  (Ø 1,90 statt 1,49 Einheiten); deshalb steht im Bericht auch der Vorteil pro eingesetzter Einheit
+  (+1,39 % gegen +0,92 % bei Hi-Lo).
+- „Anteil am Maximum“ ist ein Verhältnis aus zwei verrauschten Werten. Die Reihenfolge der
+  Zählsysteme ist im Langlauf nicht sicher (überlappende Vertrauensintervalle); die Betting
+  Correlation ist die zuverlässigere Rangfolge.
+- Simuliert wird mit dem Ganzkarten-Schuh ohne Erkennungsfehler (perfekte Erkennung).
+
+---
+
+## Gesamtübersicht der Tests (Stand Phase 6)
+
+354 Tests in 15 Dateien. Ausgeführt in der Entwicklungsumgebung (Linux, ohne echten Bildschirm):
+
+| Umgebung | Ergebnis | Übersprungen (Grund) |
+|---|---|---|
+| Python 3.12 auf virtuellem Bildschirm (`xvfb-run`), alle Tests | **353 grün** | 1: echter Jev-Test (kein API-Key) |
+| Python 3.13 ohne Display, alle Tests | **344 grün** | 2: GUI-Datei mit 9 Tests (kein Display), echter Jev-Test |
+| Python 3.11 ohne Display, ohne Browser-Tests | **319 grün** | wie oben; 25 Browser-Tests abgewählt |
+
+| Datei | Tests | Inhalt |
+|---|---:|---|
+| test_exact.py | 93 | exakte Erwartungswerte, Peek, Split, Charlie, EOR |
+| test_strategy.py | 85 | Basic Strategy, Regelvarianten, I18/Fab 4, Einsatz, Abgleich mit exakter Berechnung |
+| test_recognition_parts.py | 30 | Stabilität, Bereiche, Profile, Kalibrierung, Log, Genauigkeitsmessung, Pipeline |
+| test_counting.py | 26 | sechs Zählsysteme, True Count, ungesehene Karten, Mischen, Statistik |
+| test_tracking.py | 21 | Tisch-Modus (einmal zählen, Split, Korrektur, Rundenende) und Verlaufs-Modus |
+| test_simulation.py | 21 | Simulator-Regeln, Seed, Spieler, Hausvorteil, Bericht |
+| test_mock_casino_game.py | 20 | Spielregeln des Mock-Casinos im Headless-Browser |
+| test_recognition_images.py | 12 | Erkennung auf Screenshots, gedrehte Ecken, 125 %-Zoom, Kalibrierung B/D/K |
+| test_app.py | 12 | Assistant, Worker-Thread, Overlay-Texte |
+| test_jev.py | 11 | Jev mit nachgebildeter API, Rückfall, Sicherheit des Keys |
+| test_gui_display.py | 9 | Overlay, Bereichsauswahl, Kalibrierfenster, mss, Hotkeys, Gesamtablauf (Display nötig) |
+| test_mock_server.py | 5 | Server und Ground-Truth-Log |
+| test_card_svgs.py | 4 | Karten-SVGs |
+| test_mock_casino_e2e.py | 3 | Mock-Casino über die Oberfläche gegen Ground Truth |
+| test_recognition_e2e.py | 2 | ganze Erkennung im Headless-Browser gegen Ground Truth (≥ 99 % / ≥ 97 %) |
+
+Was nur lokal geprüft werden kann, steht in [LOCAL_TESTS.md](LOCAL_TESTS.md).

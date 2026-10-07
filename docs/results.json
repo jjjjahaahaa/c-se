@@ -1,0 +1,376 @@
+{
+ "created": "2026-10-07 10:24",
+ "seed": 2026,
+ "runtime_s": 522.7350323200226,
+ "runs_10k": [
+  {
+   "name": "Basic Strategy (ohne Zählen)",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": -211.0,
+   "ev_per_round": -0.0211,
+   "ci95": 0.0224,
+   "ev_per_unit_bet": -0.0211,
+   "sd_per_round": 1.143,
+   "mean_bet": 1.0,
+   "max_drawdown": 248.0,
+   "shuffles": 230
+  },
+  {
+   "name": "Hi-Lo",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": 262.0,
+   "ev_per_round": 0.0262,
+   "ci95": 0.04804,
+   "ev_per_unit_bet": 0.01702,
+   "sd_per_round": 2.4511,
+   "mean_bet": 1.539,
+   "max_drawdown": 142.0,
+   "shuffles": 230
+  },
+  {
+   "name": "KO (Knock-Out)",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": 199.0,
+   "ev_per_round": 0.0199,
+   "ci95": 0.04916,
+   "ev_per_unit_bet": 0.01247,
+   "sd_per_round": 2.5084,
+   "mean_bet": 1.596,
+   "max_drawdown": 237.5,
+   "shuffles": 230
+  },
+  {
+   "name": "Hi-Opt II",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": 319.5,
+   "ev_per_round": 0.03195,
+   "ci95": 0.05268,
+   "ev_per_unit_bet": 0.01919,
+   "sd_per_round": 2.6875,
+   "mean_bet": 1.665,
+   "max_drawdown": 187.0,
+   "shuffles": 230
+  },
+  {
+   "name": "Omega II",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": 238.5,
+   "ev_per_round": 0.02385,
+   "ci95": 0.05087,
+   "ev_per_unit_bet": 0.01472,
+   "sd_per_round": 2.5956,
+   "mean_bet": 1.621,
+   "max_drawdown": 198.0,
+   "shuffles": 230
+  },
+  {
+   "name": "Zen Count",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": 189.0,
+   "ev_per_round": 0.0189,
+   "ci95": 0.04773,
+   "ev_per_unit_bet": 0.01228,
+   "sd_per_round": 2.4352,
+   "mean_bet": 1.54,
+   "max_drawdown": 161.5,
+   "shuffles": 230
+  },
+  {
+   "name": "Wong Halves",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": 213.0,
+   "ev_per_round": 0.0213,
+   "ci95": 0.04811,
+   "ev_per_unit_bet": 0.01382,
+   "sd_per_round": 2.4547,
+   "mean_bet": 1.542,
+   "max_drawdown": 152.0,
+   "shuffles": 230
+  },
+  {
+   "name": "Exakt (Restzusammensetzung)",
+   "mode": "shoe",
+   "rounds": 10000,
+   "net": 266.0,
+   "ev_per_round": 0.0266,
+   "ci95": 0.06196,
+   "ev_per_unit_bet": 0.01383,
+   "sd_per_round": 3.1614,
+   "mean_bet": 1.923,
+   "max_drawdown": 199.5,
+   "shuffles": 230
+  },
+  {
+   "name": "Basic Strategy (ohne Zählen)",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 40.5,
+   "ev_per_round": 0.00405,
+   "ci95": 0.02255,
+   "ev_per_unit_bet": 0.00405,
+   "sd_per_round": 1.1506,
+   "mean_bet": 1.0,
+   "max_drawdown": 75.0,
+   "shuffles": 10000
+  },
+  {
+   "name": "Hi-Lo",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 40.5,
+   "ev_per_round": 0.00405,
+   "ci95": 0.02255,
+   "ev_per_unit_bet": 0.00405,
+   "sd_per_round": 1.1506,
+   "mean_bet": 1.0,
+   "max_drawdown": 75.0,
+   "shuffles": 10000
+  },
+  {
+   "name": "KO (Knock-Out)",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 40.5,
+   "ev_per_round": 0.00405,
+   "ci95": 0.02255,
+   "ev_per_unit_bet": 0.00405,
+   "sd_per_round": 1.1506,
+   "mean_bet": 1.0,
+   "max_drawdown": 75.0,
+   "shuffles": 10000
+  },
+  {
+   "name": "Hi-Opt II",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 40.5,
+   "ev_per_round": 0.00405,
+   "ci95": 0.02255,
+   "ev_per_unit_bet": 0.00405,
+   "sd_per_round": 1.1506,
+   "mean_bet": 1.0,
+   "max_drawdown": 75.0,
+   "shuffles": 10000
+  },
+  {
+   "name": "Omega II",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 40.5,
+   "ev_per_round": 0.00405,
+   "ci95": 0.02255,
+   "ev_per_unit_bet": 0.00405,
+   "sd_per_round": 1.1506,
+   "mean_bet": 1.0,
+   "max_drawdown": 75.0,
+   "shuffles": 10000
+  },
+  {
+   "name": "Zen Count",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 40.5,
+   "ev_per_round": 0.00405,
+   "ci95": 0.02255,
+   "ev_per_unit_bet": 0.00405,
+   "sd_per_round": 1.1506,
+   "mean_bet": 1.0,
+   "max_drawdown": 75.0,
+   "shuffles": 10000
+  },
+  {
+   "name": "Wong Halves",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 40.5,
+   "ev_per_round": 0.00405,
+   "ci95": 0.02255,
+   "ev_per_unit_bet": 0.00405,
+   "sd_per_round": 1.1506,
+   "mean_bet": 1.0,
+   "max_drawdown": 75.0,
+   "shuffles": 10000
+  },
+  {
+   "name": "Exakt (Restzusammensetzung)",
+   "mode": "every_round",
+   "rounds": 10000,
+   "net": 52.0,
+   "ev_per_round": 0.0052,
+   "ci95": 0.02257,
+   "ev_per_unit_bet": 0.0052,
+   "sd_per_round": 1.1517,
+   "mean_bet": 1.0,
+   "max_drawdown": 69.5,
+   "shuffles": 10000
+  }
+ ],
+ "runs_big": [
+  {
+   "name": "Basic Strategy (ohne Zählen)",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": -849.5,
+   "ev_per_round": -0.0017,
+   "ci95": 0.00316,
+   "ev_per_unit_bet": -0.0017,
+   "sd_per_round": 1.1417,
+   "mean_bet": 1.0,
+   "max_drawdown": 1167.5,
+   "shuffles": 11479
+  },
+  {
+   "name": "Hi-Lo",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": 6863.0,
+   "ev_per_round": 0.01373,
+   "ci95": 0.00658,
+   "ev_per_unit_bet": 0.00919,
+   "sd_per_round": 2.3748,
+   "mean_bet": 1.494,
+   "max_drawdown": 1192.0,
+   "shuffles": 11493,
+   "share_of_max": 0.5502
+  },
+  {
+   "name": "KO (Knock-Out)",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": 7028.0,
+   "ev_per_round": 0.01406,
+   "ci95": 0.00672,
+   "ev_per_unit_bet": 0.00902,
+   "sd_per_round": 2.426,
+   "mean_bet": 1.558,
+   "max_drawdown": 1385.5,
+   "shuffles": 11499,
+   "share_of_max": 0.5619
+  },
+  {
+   "name": "Hi-Opt II",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": 7821.0,
+   "ev_per_round": 0.01564,
+   "ci95": 0.00727,
+   "ev_per_unit_bet": 0.00972,
+   "sd_per_round": 2.6227,
+   "mean_bet": 1.61,
+   "max_drawdown": 1455.0,
+   "shuffles": 11498,
+   "share_of_max": 0.6185
+  },
+  {
+   "name": "Omega II",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": 7800.5,
+   "ev_per_round": 0.0156,
+   "ci95": 0.00727,
+   "ev_per_unit_bet": 0.00971,
+   "sd_per_round": 2.6217,
+   "mean_bet": 1.607,
+   "max_drawdown": 1291.0,
+   "shuffles": 11495,
+   "share_of_max": 0.617
+  },
+  {
+   "name": "Zen Count",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": 7143.0,
+   "ev_per_round": 0.01429,
+   "ci95": 0.00665,
+   "ev_per_unit_bet": 0.00951,
+   "sd_per_round": 2.4,
+   "mean_bet": 1.503,
+   "max_drawdown": 1369.0,
+   "shuffles": 11497,
+   "share_of_max": 0.5701
+  },
+  {
+   "name": "Wong Halves",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": 6321.0,
+   "ev_per_round": 0.01264,
+   "ci95": 0.00679,
+   "ev_per_unit_bet": 0.00829,
+   "sd_per_round": 2.4484,
+   "mean_bet": 1.526,
+   "max_drawdown": 1054.5,
+   "shuffles": 11494,
+   "share_of_max": 0.5115
+  },
+  {
+   "name": "Exakt (Restzusammensetzung)",
+   "mode": "shoe",
+   "rounds": 500000,
+   "net": 13169.0,
+   "ev_per_round": 0.02634,
+   "ci95": 0.00879,
+   "ev_per_unit_bet": 0.01385,
+   "sd_per_round": 3.1728,
+   "mean_bet": 1.901,
+   "max_drawdown": 1065.5,
+   "shuffles": 11500
+  }
+ ],
+ "eor": {
+  "2": 0.000693,
+  "3": 0.000832,
+  "4": 0.001133,
+  "5": 0.00145,
+  "6": 0.000782,
+  "7": 0.000402,
+  "8": -0.000107,
+  "9": -0.000413,
+  "10": -0.000919,
+  "A": -0.000935
+ },
+ "base_ev": -0.0033720493386504846,
+ "betting_correlation": {
+  "hi_lo": {
+   "bc": 0.9615
+  },
+  "ko": {
+   "bc": 0.9578
+  },
+  "hi_opt_2": {
+   "bc": 0.921,
+   "bc_ace_adjusted": 0.9734
+  },
+  "omega_2": {
+   "bc": 0.9291,
+   "bc_ace_adjusted": 0.9812
+  },
+  "zen": {
+   "bc": 0.9586
+  },
+  "wong_halves": {
+   "bc": 0.9926
+  }
+ },
+ "jev_note": "nicht simuliert – kein API-Key vorhanden (Jev: kein API-Key → lokale Strategie (offline)). Mit Key: `python -m blackjack_assistant simulate` erneut ausführen; die Variante „Jev + Hi-Lo“ erscheint dann automatisch.",
+ "findings": [
+  "Basic Strategy ohne Zählen verliert langfristig: theoretisch -0.34 % pro Einheit (exakt berechnet), im Langlauf -0.17 % ± 0.32 % pro Runde.",
+  "Mit Hi-Lo, Abweichungen und Spread 1–8 dreht der Vorteil ins Plus: +1.37 % pro Runde (± 0.66 %), +0.92 % pro eingesetzter Einheit.",
+  "Die exakte Strategie (theoretisches Maximum) erreicht +2.63 % pro Runde (+1.39 % pro eingesetzter Einheit). Die Zählsysteme holen davon 51–62 % des möglichen Zusatzgewinns; am meisten Hi-Opt II (+1.56 %). Die Unterschiede zwischen den Systemen liegen innerhalb des Zufallsspielraums.",
+  "In den geforderten 10'000 Händen ist das Ergebnis vom Zufall geprägt: Hi-Lo +262 Einheiten, Basic -211, Exakt +266 (95-%-Spielraum pro Runde ca. ± 4.8 %).",
+  "Zählen erhöht die Schwankungen deutlich: Streuung pro Runde 2.45 Einheiten statt 1.14 (Basic), weil bei hohem Count mehr gesetzt wird.",
+  "Wenn nach jeder Runde gemischt wird, bringt Zählen nichts: Alle Zählsysteme spielen dann Basic Strategy mit 1 Einheit; auch die exakte Strategie kann nur noch die Karten der laufenden Runde nutzen."
+ ],
+ "shoe_vs_every": [
+  "Tiefer Schuh (75 %): im Schnitt 43.5 Runden pro Schuh, der Count kann sich aufbauen, Einsatz und Spielzüge passen sich an.",
+  "Mischen nach jeder Runde: 10000 Mischvorgänge in 10000 Runden. Hi-Lo setzt dann immer 1 Einheit (Ø Einsatz 1.00) und hat denselben Nachteil wie Basic Strategy.",
+  "Viele Online-Casinos (auch im Demo-Modus) mischen nach jeder Runde oder nutzen einen Zufallsgenerator pro Karte – genau dieser Fall. Das Overlay warnt dann mit „Zählen hier wirkungslos“."
+ ]
+}

@@ -22,7 +22,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-from ..models import hand_total
 from .events import CardEvent, EventType
 from .matcher import Detection
 
