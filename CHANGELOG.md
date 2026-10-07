@@ -190,3 +190,43 @@ Level-2-Systeme, KO-Schwellen, Einsatzstaffelung.
   gerundet (einstellbar: `counting.deck_rounding`).
 - Seven-Card Charlie (Playtech-Profil) ist in der Basic-Strategy-Tabelle nicht berücksichtigt
   (betrifft nur Hände mit 6 Karten); die exakte Berechnung kennt die Regel.
+
+---
+
+## Phase 4 – Overlay
+
+- `Assistant` (`app.py`): verbindet Erkennung → Zählung → Strategie → Einsatz und liefert einen
+  reinen Datenzustand (`OverlayState`). Keine GUI darin, deshalb ohne Bildschirm testbar.
+  - Empfehlung nur, wenn eine Entscheidung ansteht: genau eine offene Dealerkarte, Spielerhand mit
+    mindestens zwei Karten unter 21. Bei Split wird die Hand bewertet, die zuletzt eine Karte bekam.
+  - Erlaubte Aktionen werden aus dem Tisch abgeleitet (Verdoppeln nur mit zwei Karten, Teilen bis
+    zur Höchstzahl Hände, Aufgeben nur als erste Entscheidung ohne Split).
+  - Versicherungsempfehlung, wenn der Dealer ein Ass zeigt.
+- `AssistantWorker`: Thread für Aufnahme und Auswertung, Zustände über eine Queue ans Overlay,
+  Befehle (Pause, Reset, Profilwechsel) über eine zweite Queue zurück.
+- Overlay (`overlay/window.py`, tkinter): klein, immer im Vordergrund, halbtransparent,
+  verschiebbar. Zeigt Running Count, True Count, Decks übrig, Einsatz, Spielzug (farbig) mit
+  Quelle, Hand gegen Dealerkarte, Versicherung, Wahrscheinlichkeiten (für Jev), aktives Profil,
+  Warnungen (gelb: unsichere Erkennung, Pause; rot: Zählen wirkungslos).
+- Hotkeys (`overlay/hotkeys.py`, pynput): F8 Pause, F9 Count zurücksetzen, F10 Profil wechseln.
+  Global; falls das System das nicht erlaubt, funktionieren dieselben Tasten im Overlay.
+- Befehl `python -m blackjack_assistant run [--profile …] [--engine …] [--no-overlay]`.
+  Beim Beenden werden Erkennungs-Log und Mischstatistik ausgegeben.
+
+**Tests**
+- Ohne Display: Assistant mit Test-Screenshots (Empfehlung, Zählung über eine ganze Runde,
+  Split, Pause/Reset, „mischt jede Runde“), Worker-Thread mit Befehlen und Profilwechsel,
+  Overlay-Texte und Warnungen.
+- Mit virtuellem Bildschirm (Xvfb, Python 3.12 mit tkinter): Overlay-Fenster und Tasten,
+  Bereichsauswahl per Maus (auch Abbruch mit Esc), Kalibrierfenster, Bildschirmaufnahme mit mss,
+  globale Hotkeys, `run` mit und ohne Overlay, **Gesamtablauf**: Mock-Casino im sichtbaren
+  Browser, Aufnahme mit mss, Worker und Overlay – der angezeigte Running Count stimmt mit der
+  Ground Truth überein.
+
+**Offene Entscheidungen**
+- „Immer im Vordergrund“ konnte auf dem virtuellen Bildschirm nicht geprüft werden (ohne
+  Fenstermanager wirkt `-topmost` nicht) → LOCAL_TESTS C2.
+- Hotkeys sind fest F8/F9/F10 (in `overlay/hotkeys.py` änderbar), weil diese Tasten in Browsern
+  kaum belegt sind (F11 = Vollbild, F12 = Entwicklertools werden bewusst vermieden).
+- Der Worker wertet ca. 12 Bilder pro Sekunde aus. Gezählt wird trotzdem nur, wenn das Bild
+  300 ms ruhig war.

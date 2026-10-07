@@ -5,6 +5,10 @@ numpy>=1.26
 opencv-python-headless>=4.8      # Template Matching (ohne eigene GUI, Fenster macht tkinter)
 mss>=9.0                         # Bildschirmaufnahme
 
+# --- Overlay (Phase 4) -------------------------------------------------
+# tkinter ist Teil von Python (Linux: Paket python3-tk installieren)
+pynput>=1.7                      # globale Hotkeys
+
 # --- Tests ------------------------------------------------------------
 pytest>=8.0
 # Browser-Tests für das Mock-Casino (Headless, kein Bildschirm nötig).

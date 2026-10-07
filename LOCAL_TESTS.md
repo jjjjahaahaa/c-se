@@ -41,7 +41,7 @@ Browserfenster mit dem Mock-Casino geöffnet lassen, Zoom 100 %.
 | B3 | Esc während der Auswahl | „Abgebrochen.“, Profil unverändert | |
 | B4 | Mehrere Monitore / Windows-Skalierung 125 % (falls vorhanden): B1 wiederholen | Gespeicherte Koordinaten passen zum Tisch (siehe B6) | |
 | B5 | Einige Karten aufdecken, dann `python -m blackjack_assistant scale --profile mock_casino` | `table: Skalierung ≈1.00` (bei 125 % Windows-Skalierung ≈1.25) und `history: ≈0.95`, Übereinstimmung > 0.9 | |
-| B6 | `python -m blackjack_assistant run --profile mock_casino --no-overlay` (ab Phase 4) und 20 Runden spielen, dann Ctrl+C | Konsole zeigt jede Karte genau einmal, „Rundenende“ nach dem Abräumen | |
+| B6 | `python -m blackjack_assistant run --profile mock_casino --no-overlay` und 20 Runden spielen, dann Ctrl+C | Konsole zeigt laufend RC/TC/Decks/Einsatz/Zug; nach Ctrl+C Pfad des Erkennungs-Logs | |
 | B7 | `python tools/measure_accuracy.py` (nimmt automatisch die neuesten Logs) | Genauigkeit ≥ 99 % (Verlauf) bzw. ≥ 97 % (Tisch, Profil auf `"read_mode": "table"` stellen) | |
 | B8 | `logs/recognition/<Zeit>/index.html` im Browser öffnen | Mini-Screenshot jeder erkannten Karte, unsichere gelb | |
 | B9 | Browser-Zoom auf 125 % stellen, B5 + B6 wiederholen | Skalierung ≈1.25 erkannt, Karten weiterhin korrekt | |
@@ -57,3 +57,30 @@ Browserfenster mit dem Mock-Casino geöffnet lassen, Zoom 100 %.
 | B14 | `python -m blackjack_assistant profiles` | Templates=13 (keine fehlen) | |
 | B15 | `run --profile playtech_blackjack_surrender --no-overlay`, 20 Runden spielen | Karten werden gezählt; Overlay/Konsole meldet „Zählen hier wirkungslos“ (mischt jede Runde) | |
 | B16 | `logs/recognition/<Zeit>/index.html` von Hand mit den gespielten Karten vergleichen | Anteil richtig erkannter Karten notieren (Ziel ≥ 97 %) | |
+
+---
+
+## C. Overlay und Hotkeys (Phase 4)
+
+Voraussetzung: Bereiche für `mock_casino` festgelegt (B1, B2), Mock-Casino im Browser offen.
+
+| # | Befehl / Aktion | Erwartetes Ergebnis | OK? |
+|---|---|---|---|
+| C1 | `python -m blackjack_assistant run --profile mock_casino` | Kleines dunkles Fenster: Profil, Running Count, True Count, Decks übrig, Einsatz, Hotkey-Leiste | |
+| C2 | Auf das Browserfenster klicken | Overlay bleibt **im Vordergrund** (konnte auf dem virtuellen Bildschirm nicht geprüft werden, da dort kein Fenstermanager läuft) | |
+| C3 | Overlay mit der Maus verschieben | Fenster folgt der Maus | |
+| C4 | Runde austeilen und auf die Entscheidung warten | Nach ca. 0,3 s erscheint der Spielzug (z. B. „STEHEN“, farbig) und darunter „Basic Strategy“ bzw. „Abweichung: …“ | |
+| C5 | Running Count mit eigener Zählung vergleichen (Hi-Lo: 2–6 = +1, 10–A = −1) | Gleicher Wert; Decks übrig sinkt; True Count = RC / Decks | |
+| C6 | Dealer zeigt Ass | Zusätzlich „Versicherung: nein“ (oder „JA“ ab TC +3) | |
+| C7 | **F8** drücken, während das Casino-Fenster den Fokus hat | Gelbe Warnung „PAUSE – es wird nicht gezählt“; neue Karten ändern den Count nicht. Nochmals F8 → weiter | |
+| C8 | **F9** drücken | Count auf 0, Decks wieder 6 | |
+| C9 | **F10** drücken | Profil wechselt (Profilzeile oben), z. B. zu `playtech_blackjack_surrender` | |
+| C10 | Falls globale Hotkeys nicht gehen (macOS: Bedienungshilfen-Berechtigung fehlt; Linux: Wayland) | Meldung in der Konsole; F8/F9/F10 funktionieren dann, wenn das Overlay den Fokus hat | |
+| C11 | Einstellungen im Mock-Casino → „Nach jeder Runde neu mischen“, Profil-Regel `shuffle_every_round` auf `true` setzen, neu starten | Rote Warnung „Spiel mischt jede Runde – Zählen hier wirkungslos“, Einsatz immer 1 Einheit | |
+| C12 | Browser-Zoom ändern, bis Karten undeutlich werden (z. B. 50 %) | Gelbe Warnung „Unsichere Erkennung“, unsichere Karten werden nicht gezählt | |
+| C13 | Escape im Overlay oder Ctrl+C in der Konsole | Programm endet, Pfad des Erkennungs-Logs und ggf. Mischstatistik werden ausgegeben | |
+| C14 | Optional: `pytest -m display` | GUI-Tests laufen auf dem echten Bildschirm (Fenster blitzen kurz auf) | |
+
+Automatischer Gesamtablauf (öffnet einen sichtbaren Browser, spielt 5 Runden, zeigt das Overlay):
+`python tools/screen_demo.py --rounds 5 --shot logs/overlay_demo.png` → Ausgabe vergleicht den
+angezeigten Running Count mit der Ground Truth (müssen gleich sein).

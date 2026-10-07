@@ -5,8 +5,9 @@
   python -m blackjack_assistant calibrate --profile mein_spiel
   python -m blackjack_assistant scale --profile mock_casino
   python -m blackjack_assistant replay --profile mock_casino --frames logs/frames
+  python -m blackjack_assistant run --profile mock_casino
 
-Befehle, die den Bildschirm brauchen (select-region, calibrate, scale), werden lokal
+Befehle, die den Bildschirm brauchen (select-region, calibrate, scale, run), werden lokal
 getestet (siehe LOCAL_TESTS.md). Alle anderen laufen auch ohne Display.
 """
 
@@ -170,6 +171,12 @@ def cmd_report(args) -> int:
     return 0
 
 
+def cmd_run(args) -> int:
+    from .app import run_app
+
+    return run_app(profile_name=args.profile, engine=args.engine, no_overlay=args.no_overlay)
+
+
 # ----------------------------------------------------------------------
 
 
@@ -209,6 +216,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("folder")
     p.set_defaults(func=cmd_report)
 
+    p = sub.add_parser("run", help="Assistent mit Overlay starten")
+    p.add_argument("--profile", help="Profil (Standard: erstes Profil)")
+    p.add_argument("--engine", choices=["strategy", "jev"],
+                   help="Entscheidungs-Engine (Standard: aus dem Profil)")
+    p.add_argument("--no-overlay", action="store_true",
+                   help="ohne Fenster, Ausgabe in der Konsole")
+    p.set_defaults(func=cmd_run)
     return parser
 
 

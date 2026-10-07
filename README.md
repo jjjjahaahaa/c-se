@@ -288,6 +288,36 @@ Im Profil (`counting`, `betting`):
   Systeme werden die Hi-Lo-Indizes umgerechnet (Faktor = Regression der Kartenwerte auf Hi-Lo).
 - **Einsatz**: 1 Einheit bis TC +1, danach laut Staffelung.
 
+## Overlay (Phase 4)
+
+```bash
+python -m blackjack_assistant run --profile mock_casino          # mit Overlay
+python -m blackjack_assistant run --profile mock_casino --no-overlay   # nur Konsole
+```
+
+Das Overlay ist ein kleines tkinter-Fenster, immer im Vordergrund und verschiebbar. Es zeigt
+Running Count, True Count, verbleibende Decks, empfohlenen Einsatz, empfohlenen Spielzug
+(mit Quelle: Basic Strategy / Abweichung / Jev), aktives Profil und Warnungen
+(gelb: unsichere Erkennung, Pause; rot: Zählen wirkungslos).
+
+| Taste | Funktion |
+|---|---|
+| F8 | Pause (nichts zählen) |
+| F9 | Count zurücksetzen |
+| F10 | Profil wechseln |
+
+Die Hotkeys sind global (pynput), funktionieren also auch, wenn das Casino-Fenster den Fokus
+hat. Ohne Berechtigung (macOS) bzw. unter Wayland gelten sie nur im Overlay-Fenster.
+
+**Aufbau:** Ein Worker-Thread nimmt laufend den Bildschirm auf und schickt den neuen Zustand
+über eine Queue an das Overlay (tkinter darf nur im Hauptthread verändert werden). Hotkeys
+schicken Befehle (Pause, Reset, Profilwechsel) über eine zweite Queue an den Worker.
+
+**Tests ohne echten Bildschirm:** `xvfb-run -a python -m pytest -m display` startet Overlay,
+Bereichsauswahl, Kalibrierfenster, Bildschirmaufnahme und Hotkeys auf einem virtuellen
+Bildschirm. `tools/screen_demo.py` spielt das Mock-Casino in einem sichtbaren Browser und
+prüft den im Overlay angezeigten Count gegen die Ground Truth.
+
 ## Konfiguration und Geheimnisse
 
 - Der Jev-API-Key wird **nur** aus der Umgebungsvariable `JEV_API_KEY` gelesen
